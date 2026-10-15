@@ -328,6 +328,11 @@ a.comp:hover .t { text-decoration: underline; }
 .tipbox::before { content: ""; position: absolute; left: 12px; top: -5px; width: 10px; height: 10px; background: var(--fg); transform: rotate(45deg); }
 @media (hover: hover) { .tip:hover .tipbox { display: block; } }
 .tip.open .tipbox, .tip:focus-visible .tipbox { display: block; }
+
+.dist { font-style: normal; font-size: 11.5px; font-weight: 700; padding: 1px 7px; border-radius: 999px; margin-right: 4px; vertical-align: 1px; white-space: nowrap; }
+.dist.d1 { background: var(--good-soft); color: var(--good); }
+.dist.d2 { background: var(--accent-soft); color: var(--accent); }
+.dist.d3 { background: var(--warn-soft); color: var(--warn); }
 </style>
 </head>
 <body>
@@ -656,8 +661,9 @@ function openPanel(r) {
       </dl>
 
       ${z ? `<div class="box">
-        <span class="lbl">Zona${z.district ? ' ' + esc(z.district) : ''} · median ${nf.format(z.median_ppm)} €/mp (${z.n} anunțuri active)</span>
-        ${z.items.map(i => `<a class="comp" href="${i.url}" target="_blank" rel="noopener"><span class="t">${esc(i.title)}</span><span class="cmeta num">${eur(i.price)} · ${String(i.area).replace('.', ',')} mp · <b>${nf.format(Math.round(i.price / i.area))} €/mp</b>${i.dist != null ? ' · la ' + dist(i.dist) : ''} · ${ago(i.age)}</span></a>`).join('')}
+        <span class="lbl">${z.scope === 'raza' ? `Anunțuri active la max ${dist(z.radius_m)} · median ${nf.format(z.median_ppm)} €/mp (${z.n_near} anunțuri)` : `Zona${z.district ? ' ' + esc(z.district) : ''} · median ${nf.format(z.median_ppm)} €/mp (${z.n} anunțuri)`}</span>
+        ${z.scope !== 'raza' ? `<span class="muted small">${z.precise ? `Sub 3 anunțuri active în raza de ${dist(z.radius_m)}; mediana e calculată pe zona mai largă.` : 'Nu știm poziția exactă a blocului, așa că nu putem măsura distanța; anunțurile sunt din aceeași localitate.'}</span>` : ''}
+        ${z.items.map(i => `<a class="comp" href="${i.url}" target="_blank" rel="noopener"><span class="t">${i.dist != null ? `<em class="dist ${i.dist <= 500 ? 'd1' : i.dist <= 1500 ? 'd2' : 'd3'}">${dist(i.dist)}</em> ` : ''}${esc(i.title)}</span><span class="cmeta num">${eur(i.price)} · ${String(i.area).replace('.', ',')} mp · <b>${nf.format(Math.round(i.price / i.area))} €/mp</b> · ${ago(i.age)}</span></a>`).join('')}
         <div class="links"><a href="${z.search_url}" target="_blank" rel="noopener">Toate anunțurile din zonă</a><a href="${z.olx_url}" target="_blank" rel="noopener">Caută pe OLX</a></div>
       </div>` : ''}
 

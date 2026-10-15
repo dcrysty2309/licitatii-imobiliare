@@ -19,7 +19,8 @@ ROOMS = {1: 'ONE', 2: 'TWO', 3: 'THREE', 4: 'FOUR'}
 NOW = datetime.fromisoformat(TODAY).replace(tzinfo=timezone.utc)
 BLOCKED = {'n': 0}
 MAX_AGE_DAYS = 120
-DETAILS_PER_AUCTION = 9
+DETAILS_PER_AUCTION = 20
+RADIUS_M = 1500
 NEWBUILD = re.compile(r'constructie|finalizare|bloc-nou|ansamblu|dezvoltator|predare|proiect-nou|comision-0|rezidential|residence|202[6-8]')
 
 def slug(s):
@@ -220,7 +221,15 @@ for r in targets:
         checked.append(dict(i, dist=dist, age=age, modified=(d['modified'] or '')[:10]))
     if precise:
         checked.sort(key=lambda i: (i['dist'] is None, i['dist'] or 0))
-    picks = checked[:3]
+    near = [i for i in checked if i['dist'] is not None and i['dist'] <= RADIUS_M]
+    scope = 'larg'
+    if precise and len(near) >= 3:
+        # mediana doar din anunturile active din raza de 1,5 km
+        nppm = sorted(i['ppm'] for i in near)
+        clean = nppm
+        q = statistics.quantiles(nppm, n=4) if len(nppm) >= 4 else [min(nppm), statistics.median(nppm), max(nppm)]
+        scope = 'raza'
+    picks = (near if precise and near else checked)[:3]
 
     city_slug_olx = 'bucuresti' if county == 'bucuresti' else city
     olx_q = slug(district[0]) if district else ''
@@ -229,6 +238,7 @@ for r in targets:
         'status': 'ok', 'level': level, 'district': district[0] if district else None, 'match': district[2] if district else None,
         'n': len(clean), 'median_ppm': round(statistics.median(clean)), 'p25': round(q[0]), 'p75': round(q[-1]),
         'search_url': pool_url, 'olx_url': olx, 'checked': len(cand), 'active_ok': len(checked),
+        'scope': scope, 'radius_m': RADIUS_M, 'n_near': len(near), 'precise': precise,
         'items': [{k: i[k] for k in ('url', 'title', 'area', 'rooms', 'floor', 'price', 'dist', 'age', 'modified')} for i in picks],
     }
     done += 1
