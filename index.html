@@ -352,8 +352,9 @@ td.r .l1, td.r .l2 { text-align: right; }
 .prop .l2.pl2 { white-space: nowrap; display: flex; align-items: center; gap: 6px; }
 .ptype.ic { padding: 2px 4px; border-radius: 5px; background: var(--surface-2); border: 1px solid var(--line); }
 
-td.pm { width: 150px; }
-td.pm .l2 { white-space: normal; }
+td.pm { width: 130px; }
+td.pm .l2 { white-space: nowrap; }
+td.pm .zl { font-size: 11.5px; opacity: .8; margin-top: 0; }
 .risks { max-width: 150px; }
 </style>
 </head>
@@ -594,7 +595,7 @@ function discTip(r) {
 function zoneLabel(r) { const z = r.zone && r.zone.status === 'ok' ? r.zone : null; return z ? (z.scope === 'raza' ? 'pe 1,5 km' : z.district ? z.district : 'oraș') : r.mkt_src === 'estimare' ? 'estimare' : 'oraș'; }
 function vsCell(r) {
   if (!r.eur_m2) return `<span class="dash">—</span>`;
-  return `<span class="l1 num">${nf.format(r.eur_m2)} €/mp</span>${r.mkt_ppm ? `<span class="l2 num">zona ${nf.format(r.mkt_ppm)} € · ${esc(zoneLabel(r))}</span>` : ''}`;
+  return `<span class="l1 num">${nf.format(r.eur_m2)} €/mp</span>${r.mkt_ppm ? `<span class="l2 num">zona ${nf.format(r.mkt_ppm)} €/mp</span><span class="l2 zl">${esc(zoneLabel(r))}</span>` : ''}`;
 }
 
 function render() {
