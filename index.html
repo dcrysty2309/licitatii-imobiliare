@@ -753,7 +753,7 @@ function openPanel(r) {
         </div>
         <div class="kc">
           <span class="lbl">Față de evaluare ${r.term_src ? tip('Din publicație: „…' + r.term_src + '…”', true) : tip('Nu am găsit în publicație o frază clară despre reducere. Verifică PDF-ul.', true)}</span>
-          <b class="num" style="color:var(--good)">${evalDisc(r) != null ? '−' + evalDisc(r) + '%' : '—'}</b>
+          <b class="num" style="color:${evalDisc(r) != null ? 'var(--good)' : 'var(--muted)'}">${evalDisc(r) != null ? '−' + evalDisc(r) + '%' : (r.term === 'neclar' || r.term === 'fara text') ? 'neclar' : 'fără reducere'}</b>
           <span class="kc-sub num">evaluat ${eur(r.eval_eur)}</span>
         </div>
       </div>
@@ -788,11 +788,11 @@ function openPanel(r) {
         <div class="cmpbox"><table class="cmp">
           <thead><tr><th></th><th class="r">Suprafață</th><th class="r">Preț</th><th class="r">€/mp</th><th class="r">Distanță</th></tr></thead>
           <tbody>
-            <tr class="me"><td><b>Licitația</b><span class="sub">preț de pornire</span></td><td class="r num">${r.sqm ? String(r.sqm).replace('.', ',') + ' mp' : '—'}</td><td class="r num">${eur(r.start_eur)}</td><td class="r num"><b>${r.eur_m2 ? nf.format(r.eur_m2) : '—'}</b></td><td class="r">—</td></tr>
+            <tr class="me"><td><b>Licitația</b><span class="sub">preț de pornire</span></td><td class="r num">${r.sqm ? String(r.sqm).replace('.', ',') + ' mp' : '<span class="muted small">nespecificată</span>'}</td><td class="r num">${eur(r.start_eur)}</td><td class="r num"><b>${r.eur_m2 ? nf.format(r.eur_m2) : '—'}</b></td><td class="r">—</td></tr>
             ${z.items.map((i, n) => `<tr><td><a href="${i.url}" target="_blank" rel="noopener">Anunț ${n + 1}</a><span class="sub" title="${esc(i.title)}">${esc(i.title)}</span></td><td class="r num">${String(i.area).replace('.', ',')} mp</td><td class="r num">${eur(i.price)}</td><td class="r num"><b>${nf.format(Math.round(i.price / i.area))}</b></td><td class="r num">${i.dist != null ? `<em class="dist ${i.dist <= 500 ? 'd1' : i.dist <= 1500 ? 'd2' : 'd3'}">${dist(i.dist)}</em>` : '—'}</td></tr>`).join('')}
             <tr class="med"><td>Mediana zonei<span class="sub">${z.scope === 'raza' ? z.n_near + ' anunțuri active pe 1,5 km' : z.n + ' anunțuri active'}</span></td><td class="r"></td><td class="r"></td><td class="r num"><b>${nf.format(z.median_ppm)}</b></td><td class="r"></td></tr>
           </tbody></table></div>
-        <span class="muted small">Prețuri cerute în anunțuri active (storia.ro), verificate azi. Click pe „Anunț” pentru detalii.</span>
+        <span class="muted small">${r.sqm ? '' : 'Publicația nu menționează suprafața, așa că nu putem calcula prețul pe mp al licitației. '}Prețuri cerute în anunțuri active (storia.ro), verificate azi. Click pe „Anunț” pentru detalii.</span>
         <div class="links"><a href="${z.search_url}" target="_blank" rel="noopener">Toate anunțurile din zonă</a><a href="${z.olx_url}" target="_blank" rel="noopener">Caută pe OLX</a></div>
       </div>` : ''}
 
