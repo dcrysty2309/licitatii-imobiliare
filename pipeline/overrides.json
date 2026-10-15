@@ -1,0 +1,46 @@
+{
+ "3e4481c5": {
+  "term": "II (75%)",
+  "eval_ron": 148142.8,
+  "note": "Verificat manual: 2 cam, 41,68 mp, et.4, Mihai Bravu 239 bl.C4. Licitatia la BEJ Lumperdean, Buzau. Ipoteca legala Asociatia de Proprietari (datorii la intretinere)."
+ },
+ "6a14bb7b": {
+  "note": "EXCLUS: se vinde grevat de uzufruct viager in favoarea unei persoane (are dreptul sa locuiasca acolo pe viata)."
+ },
+ "7bbd30fd": {
+  "note": "Verificat manual: 3 cam, 75 mp, Azuga, termen III (50%), evaluare 317.000 lei. Proprietar cu domiciliul in Bucuresti (posibil locuinta de vacanta)."
+ },
+ "19d3c1ed": {
+  "term": "II (75%)",
+  "note": "Verificat manual: 2 cam, 49,48 mp construita, et.4, Azuga str. Ritivoiu nr.2 bl.2E. Termen II (75%)."
+ },
+ "7dfe9733": {
+  "note": "Verificat manual: 3 camere pe doar 36,3 mp utili, PARTER, Sector 5. Termen III (50%), evaluare 275.227 lei. Se vinde liber de sarcini."
+ },
+ "2e204d07": {
+  "note": "Verificat manual: 4 cam, 82 mp, 2 bai. Evaluare doar 179.000 lei (~35k EUR) - foarte mica pt 82 mp: verifica localitatea exacta (posibil nu e in Alba Iulia oras) si starea."
+ },
+ "cc5cefa2": {
+  "term": "II (75%)",
+  "eval_ron": 135528,
+  "note": "Verificat manual: 1 cam (camera de zi), 33,39 mp, PARTER, Bistrita str. Valeria Peter Predescu 2. ATENTIE: la pret se adauga TVA. Termen II (75%) din 135.528 lei + TVA."
+ },
+ "b6e52960": {
+  "note": "Verificat manual: 3 cam, Bicaz str. Cojusna bl.3 ap.20. Termen II (75%). Un debitor a decedat in timpul executarii - posibile complicatii."
+ },
+ "1229b867": {
+  "note": "Verificat manual: Arad, Str. Padurii 2-4 bl.B et.2; 39 mp CONSTRUITI (garsoniera/studio). Termen II (75%) din 188.326 lei."
+ },
+ "a65a5822": {
+  "term": "II (75%)",
+  "note": "Verificat manual: 1 cam, 27,72 mp utili, Medias. Pret scazut cu 25% (termen II). Evaluare din 2024."
+ },
+ "d876bb00": {
+  "term": "II (75%)",
+  "eval_ron": 54000,
+  "sqm": 35.15,
+  "rooms": 2,
+  "note": "Verificat manual: 2 cam, 35,15 mp utili + balcon, et.8, Str. Zambila Ionita nr.1 bl.33A, Sector 2 (zona Pantelimon). Termen II (75%) din 54.000 EUR. Uzufructul viager din CF s-a stins (beneficiara a decedat in 2021) - trebuie doar radiat. Creditor: asociatia de proprietari.",
+  "flags": "uzufruct stins (de radiat)"
+ }
+}

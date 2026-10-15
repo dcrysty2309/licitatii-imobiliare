@@ -135,6 +135,20 @@ section[id] { scroll-margin-top: 16px; }
 .c-tx, .c-warn { background: var(--warn-soft); color: var(--warn); }
 .c-bad { background: var(--bad-soft); color: var(--bad); }
 .c-ok { background: var(--good-soft); color: var(--good); }
+.c-new { background: #1677c9; color: #fff; letter-spacing: .04em; font-size: 10.5px; vertical-align: 2px; }
+.timeline { list-style: none; margin: 0; padding: 0 0 0 14px; border-left: 2px solid var(--line); display: grid; gap: 10px; }
+.timeline li { position: relative; display: grid; gap: 1px; font-size: 13.5px; }
+.timeline li::before { content: ""; position: absolute; left: -20px; top: 5px; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); border: 2px solid var(--surface); }
+.timeline .when { color: var(--muted); font-size: 12px; }
+.removed-wrap summary { cursor: pointer; list-style: none; display: flex; align-items: baseline; gap: 8px; }
+.removed-wrap summary::-webkit-details-marker { display: none; }
+.removed-wrap summary::after { content: "▾"; color: var(--muted); }
+.removed-wrap[open] summary::after { content: "▴"; }
+.removed { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); }
+.removed > p { padding: 16px; }
+.rm { display: grid; grid-template-columns: minmax(0, 2fr) 1fr 1fr auto; gap: 8px 16px; align-items: center; padding: 12px 16px; border-top: 1px solid var(--line); font-size: 13.5px; }
+.rm:first-child { border-top: 0; }
+@media (max-width: 760px) { .rm { grid-template-columns: 1fr 1fr; } }
 .mini .chip { box-shadow: 0 1px 3px rgb(0 0 0 / .2); }
 
 /* harta */
@@ -334,6 +348,13 @@ footer p { max-width: 110ch; }
     </div>
     <div class="list" id="list"></div>
   </section>
+  <section id="iesite">
+    <details class="removed-wrap">
+      <summary><h2 style="display:inline">Ieșite recent</h2> <span class="muted">(<span id="removed-n">0</span> în ultimele 90 de zile)</span></summary>
+      <p class="muted" style="margin:8px 0 12px">Licitații care nu mai apar pe REPES: termenul a trecut sau executorul a retras anunțul. Le păstrăm aici ca istoric.</p>
+      <div id="removed" class="removed"></div>
+    </details>
+  </section>
 </main>
 
 <footer>
@@ -379,8 +400,13 @@ function miniMap(r, z = 15) {
   return `<div class="tiles" style="left:calc(50% - ${256 + px}px);top:calc(50% - ${256 + py}px)">${imgs}</div><i class="pin" style="background:${cssv('--' + tkey(r.term))}"></i>`;
 }
 
-let ROWS = [], map, cluster;
-fetch('data.json').then(r => r.json()).then(d => { ROWS = d.rows; const up = document.getElementById('updated'); up.dataset.d = d.updated; up.textContent = `Date actualizate pe ${d.updated}. Curs oficial BNR din ${d.eur_date}: 1 € = ${d.eur.toFixed(4).replace('.', ',')} lei.`; init(); });
+let ROWS = [], REMOVED = [], TRACKED = '', map, cluster;
+const daysAgo = d => Math.round((Date.parse(TODAY) - Date.parse(d)) / 86400000);
+const isNew = r => r.first_seen && TRACKED && r.first_seen > TRACKED && daysAgo(r.first_seen) <= 3;
+const newChip = r => isNew(r) ? '<span class="chip c-new">NOU</span>' : '';
+const changedRecently = r => (r.events || []).some(e => ['pret', 'termen', 'data'].includes(e.t) && daysAgo(e.d) <= 7);
+const chgChip = r => changedRecently(r) ? '<span class="chip c-warn">modificat</span>' : '';
+fetch('data.json', { cache: 'no-cache' }).then(r => r.json()).then(d => { ROWS = d.rows; REMOVED = d.removed || []; TRACKED = d.tracked_since || ''; const up = document.getElementById('updated'); up.dataset.d = d.updated; up.textContent = `Date actualizate pe ${d.updated}. Curs oficial BNR din ${d.eur_date}: 1 € = ${d.eur.toFixed(4).replace('.', ',')} lei.`; init(); });
 
 function init() {
   const fut = ROWS.filter(r => r.date.slice(0, 10) >= TODAY);
@@ -398,7 +424,9 @@ function init() {
     [cheap.length, 'sub 60% din piață', 'trend', 'var(--good)', 'var(--good-soft)'],
     [fut.filter(r => r.term.startsWith('III')).length, 'la termenul III (−50%)', 'tag', 'var(--warn)', 'var(--warn-soft)']
   ].map(([v, l, ic, c, bg]) => `<div class="kpi"><span class="ic" style="background:${bg};color:${c}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${IC[ic]}</svg></span><div><b style="color:${c === 'var(--accent)' ? 'var(--fg)' : c}">${v}</b><span>${l}</span></div></div>`).join('');
-  document.getElementById('pill').innerHTML = `<i></i>Actualizat ${document.getElementById('updated').dataset.d} · ${fut.length} licitații active`;
+  const nNew = ROWS.filter(isNew).length;
+  document.getElementById('pill').innerHTML = `<i></i>Actualizat ${document.getElementById('updated').dataset.d} · ${fut.length} licitații active${nNew ? ` · <b>${nNew} noi</b>` : ''}`;
+  renderRemoved();
 
   // banner: harta intunecata, fara interactiune, cu toate licitatiile ca puncte luminoase
   const hm = L.map('heromap', { zoomControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false, boxZoom: false, keyboard: false, touchZoom: false, attributionControl: true, zoomSnap: 0.25 });
@@ -417,7 +445,7 @@ function init() {
     <button class="card" type="button" data-id="${r.id}">
       <div class="mini">${miniMap(r)}<span class="badge">${termChip(r.term)}</span></div>
       <div class="body">
-        <div class="place"><h3>${esc(r.city)}</h3><span>${esc(r.county)}</span></div>
+        <div class="place"><h3>${esc(r.city)} ${newChip(r)}</h3><span>${esc(r.county)}</span></div>
         <div class="spec">${esc(roomsTxt(r) || r.name)}</div>
         <div class="price num">${eur(r.start_eur)}<small>pornire</small></div>
         <div class="meter"><div class="row"><span>plătești <b class="num">${nf.format(r.eur_m2)} €/mp</b> · zona <b class="num">${nf.format(r.mkt_ppm)} €/mp</b></span><b class="num" style="color:${vsColor(r.vs_mkt)}">${r.vs_mkt}%</b></div>${vsBar(r.vs_mkt)}</div>
@@ -483,7 +511,7 @@ function render() {
   const profitHtml = r => r.profit == null ? '<span class="dash">—</span>' : `<span class="profit num" style="color:${r.profit > 10000 ? 'var(--good)' : r.profit < 0 ? 'var(--bad)' : 'var(--fg)'}">${eur(r.profit)}</span>`;
   document.getElementById('tbody').innerHTML = rows.map(r => `<tr data-id="${r.id}" tabindex="0">
     <td><span class="l1">${fmtDate(r.date)}</span><span class="l2">${termChip(r.term)}</span></td>
-    <td class="prop"><span class="l1">${esc(r.city)}<small>${esc(r.county)}</small></span><span class="l2">${esc(roomsTxt(r) || r.name)}</span></td>
+    <td class="prop"><span class="l1">${esc(r.city)}<small>${esc(r.county)}</small> ${newChip(r)}${chgChip(r)}</span><span class="l2">${esc(roomsTxt(r) || r.name)}</span></td>
     <td class="r"><span class="l1 price1 num">${eur(r.start_eur)}</span><span class="l2 num">garanție ${eur(r.guar_eur)}</span></td>
     <td>${vsCell(r)}</td>
     <td class="r">${profitHtml(r)}</td>
@@ -491,7 +519,7 @@ function render() {
     <td><div class="risks">${riskChips(r.flags)}</div></td>
   </tr>`).join('') || `<tr><td colspan="${COLS.length}" class="empty">Niciun rezultat. Încearcă alt buget sau resetează filtrele din „Mai multe filtre”.</td></tr>`;
   document.getElementById('list').innerHTML = rows.map(r => `<button class="lcard" type="button" data-id="${r.id}">
-    <div class="head"><div><h3>${esc(r.city)}</h3><span class="muted" style="font-size:12.5px">${esc(r.county)} · ${fmtDate(r.date)}</span></div>${termChip(r.term)}</div>
+    <div class="head"><div><h3>${esc(r.city)} ${newChip(r)}${chgChip(r)}</h3><span class="muted" style="font-size:12.5px">${esc(r.county)} · ${fmtDate(r.date)}</span></div>${termChip(r.term)}</div>
     <div class="muted" style="font-size:13px">${esc(roomsTxt(r) || r.name)}</div>
     <div class="price num" style="font-size:22px">${eur(r.start_eur)}<small>garanție ${eur(r.guar_eur)}</small></div>
     ${r.vs_mkt != null ? `<div class="meter"><div class="row"><span>plătești <b class="num">${nf.format(r.eur_m2)} €/mp</b> · zona <b class="num">${nf.format(r.mkt_ppm)} €/mp</b></span><b class="num" style="color:${vsColor(r.vs_mkt)}">${r.vs_mkt}%</b></div>${vsBar(r.vs_mkt)}</div>` : ''}
@@ -585,6 +613,7 @@ function openPanel(r) {
         ${r.desc ? `<dt>Descriere</dt><dd>${esc(r.desc)}</dd>` : ''}
       </dl>
       ${comps}
+      ${historyBox(r)}
       <p class="src">Sursa: publicația executorului judecătoresc pe REPES (prod.executori.ro). Comparabile: storia.ro, prețuri cerute.</p>
     </div>`;
   p.hidden = false; document.getElementById('scrim').hidden = false;
@@ -593,6 +622,26 @@ function openPanel(r) {
   p.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', closePanel));
   p.querySelector('[data-close]').focus();
   if (r.lat) map.setView([r.lat, r.lng], Math.max(map.getZoom(), 14));
+}
+function historyBox(r) {
+  const ev = r.events || [];
+  if (!ev.length) return '';
+  const T = { nou: 'A apărut pe REPES', pret: 'Preț de pornire schimbat', termen: 'Termen schimbat', data: 'Data licitației mutată', revenit: 'A reapărut pe REPES', iesit: 'A ieșit de pe REPES' };
+  const val = e => e.t === 'pret' ? `${eur(e.from)} → <b>${eur(e.to)}</b>` : e.t === 'termen' ? `${esc(e.from)} → <b>${esc(e.to)}</b>` : e.t === 'data' ? `${fmtDate(e.from)} → <b>${fmtDate(e.to)}</b>` : e.t === 'nou' && e.v ? `la ${eur(e.v)}` : '';
+  return `<div class="box"><h3>Istoric</h3>
+    <ol class="timeline">${ev.slice().reverse().map(e => `<li><span class="when num">${fmtDate(e.d)}</span><span>${T[e.t] || esc(e.t)} ${val(e)}</span></li>`).join('')}</ol>
+    <p class="src">Urmărim REPES zilnic din ${fmtDate(TRACKED)}.</p></div>`;
+}
+function renderRemoved() {
+  const box = document.getElementById('removed');
+  if (!box) return;
+  const list = REMOVED.filter(r => r.kind === 'apartament');
+  document.getElementById('removed-n').textContent = list.length;
+  box.innerHTML = list.length ? list.map(r => `<div class="rm"><div><b>${esc(r.city)}</b> <span class="muted">${esc(r.county || '')} · ${esc(roomsTxt(r) || r.name || '')}</span></div>
+    <div class="num">${eur(r.start_eur)} <span class="muted">· ${esc(r.term || '')}</span></div>
+    <div><span class="chip ${/trecut/.test(r.status) ? 'c-t1' : 'c-warn'}">${/trecut/.test(r.status) ? 'licitație trecută' : 'retrasă'}</span> <span class="muted">${fmtDate(r.removed_on)}</span></div>
+    <div><a href="${r.link}" target="_blank" rel="noopener">REPES</a></div></div>`).join('')
+    : `<p class="muted">Nicio licitație ieșită încă. Urmărim REPES zilnic din ${fmtDate(TRACKED || TODAY)}; aici apar licitațiile care dispar (trecute sau retrase de executor).</p>`;
 }
 function closePanel() { document.getElementById('panel').hidden = true; document.getElementById('scrim').hidden = true; history.replaceState(null, '', location.pathname); }
 document.getElementById('scrim').addEventListener('click', closePanel);

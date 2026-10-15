@@ -1,0 +1,893 @@
+{
+  "head" : {
+    "vars" : [ "s", "sLabel", "coord" ]
+  },
+  "results" : {
+    "bindings" : [ {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q12731373"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.042908 44.480218)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Jiului"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q12719860"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.06286 44.42892)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Academia Militară"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3036294"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.096558 44.404236)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Eroii Revoluției"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3036302"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.104644 44.414245)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Tineretului"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q7136365"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.0369 44.4879)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Parc Bazilescu"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q12739761"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.02402 44.41561)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Râul Doamnei"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2120902"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.11298 44.41696)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Timpuri Noi"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2380294"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.075691 44.435174)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Eroilor"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3116198"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.10274 44.43595)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Universitate"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3116217"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.19185 44.44091)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Pantelimon"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1842024"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.057445 44.461738)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Grivița"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2794825"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.00538 44.43403)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Păcii"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q549259"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.13287 44.44089)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Piața Iancului"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q534711"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.06944 44.45073)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Basarab"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q12742966"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.01412 44.4212)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Valea Ialomiței"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2682824"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.0899 44.43296)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Izvor"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3036310"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(25.991186 44.430517)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Preciziei"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q111434691"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.13942 44.42048)"
+      },
+      "sLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Dristor 2"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3036299"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.12246 44.39302)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Piața Sudului"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q18545189"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.03324 44.42225)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Parc Drumul Taberei"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1929086"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.12718 44.41196)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Mihai Bravu"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2859115"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.13566 44.37931)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Apărătorii Patriei (stație de metrou)"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2287151"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.021346 44.434289)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Gorjului"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q111434884"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.076389 44.447222)"
+      },
+      "sLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Gara de Nord 2"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1921423"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.0337 44.4345)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Lujerului"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2874311"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.0864 44.46725)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Aviatorilor"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3216768"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.031944444 44.494444444)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Laminorului"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q12722985"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.02016 44.42007)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Brâncuși"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2156002"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.12417 44.44991)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Obor"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3095257"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.07656 44.44723)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Gara de Nord"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2274002"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.10417 44.42774)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Piața Unirii"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q176844"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.050473 44.470558)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "1 Mai"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3116212"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.09765 44.44569)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Piața Romană"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1998224"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.194722 44.4075)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Nicolae Teclu"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2735368"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.14046 44.41937)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Dristor"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1961102"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.13845 44.43237)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Piața Muncii"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q963995"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.0466 44.44532)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Petrache Poenaru"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1868109"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.06 44.44282)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Grozăvești"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q12731826"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.02625 44.50166)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Străulești"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2199349"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.047083 44.452103)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Crângași"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q12737271"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.05706 44.42601)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Orizont"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q85976317"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.15925 44.34803)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Tudor Arghezi"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2388832"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.1689 44.4352)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Costin Georgian"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q12727074"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.04151 44.42313)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Tudor Vladimirescu"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2224054"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.055647 44.435058)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Politehnica"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2849579"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.20844 44.40563)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Anghel Saligny"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q12728151"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.04714 44.42432)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Favorit"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2355396"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.10531 44.4527)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Ștefan cel Mare"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2871866"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.10019 44.47917)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Aurel Vlaicu (stație de metrou)"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1874297"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.15846 44.41373)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Nicolae Grigorescu"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3116206"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.18573 44.43439)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Republica"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2896931"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.149226 44.361204)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Berceni (stație de metrou)"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3028168"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.14371 44.36878)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Dimitrie Leonida (stație de metrou)"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2602883"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.08713 44.45157)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Piața Victoriei"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q12739518"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.02469 44.4231)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Romancierilor"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3182244"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.1165 44.4806)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Pipera"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2813516"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.174444 44.410556)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "1 Decembrie 1918"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2994959"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.10902 44.398701)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Constantin Brâncoveanu (stație de metrou)"
+      }
+    }, {
+      "s" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q649962"
+      },
+      "coord" : {
+        "datatype" : "http://www.opengis.net/ont/geosparql#wktLiteral",
+        "type" : "literal",
+        "value" : "Point(26.16269 44.42501)"
+      },
+      "sLabel" : {
+        "xml:lang" : "ro",
+        "type" : "literal",
+        "value" : "Titan"
+      }
+    } ]
+  }
+}
