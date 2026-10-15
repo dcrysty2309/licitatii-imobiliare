@@ -518,7 +518,7 @@ function openPanel(r) {
   const p = document.getElementById('panel');
   const precise = r.lat != null && r.gps_q === 'adresa';
   const sv = precise ? `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${r.lat},${r.lng}&fov=55&pitch=8` : null;
-  const addrQ = r.addr && !/^\s*(romania|românia)?\s*$/i.test(r.addr) ? r.addr : `${r.city}, ${r.county}, România`;
+  const addrQ = r.maps_q || `${r.city}, ${r.county}, România`;
   const gm = precise ? `https://www.google.com/maps/search/?api=1&query=${r.lat},${r.lng}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addrQ)}`;
   const PQ = { adresa: 'exactă (blocul din publicație)', strada: 'la nivel de stradă', 'aproximativ (localitate)': 'aproximativă (doar localitatea)', 'birou executor (nu e locatia reala)': 'necunoscută (punctul e biroul executorului)', lipsa: 'lipsă' };
   const c = r.comps;
