@@ -44,35 +44,35 @@ a { color: var(--accent); text-underline-offset: 2px; }
 .container { max-width: 1320px; margin: 0 auto; padding-inline: 20px; }
 @media (max-width: 600px) { .container { padding-inline: 16px; } }
 
-/* banner: harta intunecata a Romaniei cu toate licitatiile ca puncte luminoase, text in stanga peste un gradient */
-.hero { position: relative; background: #07121b; color: #eef5fa; overflow: hidden; isolation: isolate; }
-#heromap { position: absolute; inset: 0; z-index: -2; background: #07121b; }
-#heromap .darktiles { filter: grayscale(1) invert(1) brightness(0.62) contrast(1.25) sepia(0.25) hue-rotate(160deg); opacity: 0.7; }
-#heromap .leaflet-control-attribution { background: rgb(7 18 27 / .6); color: #6f8797; font-size: 10px; }
-#heromap .leaflet-control-attribution a { color: #8fb0c4; }
+/* banner luminos: harta deschisa a Romaniei cu toate licitatiile ca puncte colorate, text in stanga peste un voal alb-albastru */
+.hero { position: relative; background: #eaf3f8; color: #10283a; overflow: hidden; isolation: isolate; border-bottom: 1px solid #d6e5ee; }
+#heromap { position: absolute; inset: 0; z-index: -2; background: #eaf3f8; }
+#heromap .lighttiles { filter: grayscale(1) sepia(0.15) hue-rotate(170deg) saturate(1.6) brightness(1.06) contrast(0.92); opacity: 0.55; }
+#heromap .leaflet-control-attribution { background: rgb(255 255 255 / .7); color: #6a7f8f; font-size: 10px; }
+#heromap .leaflet-control-attribution a { color: #3d6e8a; }
 .hero::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
-  background: linear-gradient(90deg, #07121b 0%, rgb(7 18 27 / .92) 34%, rgb(7 18 27 / .45) 62%, rgb(7 18 27 / .15) 100%),
-              linear-gradient(0deg, #07121b 0%, rgb(7 18 27 / 0) 34%); }
-.glow { border-radius: 50%; }
+  background: radial-gradient(1200px 600px at 85% -10%, rgb(61 220 143 / .18), transparent 60%),
+              radial-gradient(900px 500px at 100% 100%, rgb(79 195 232 / .20), transparent 60%),
+              linear-gradient(90deg, #f4f9fc 0%, rgb(244 249 252 / .95) 34%, rgb(244 249 252 / .55) 60%, rgb(244 249 252 / .10) 100%); }
 .nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: calc(18px + env(safe-area-inset-top, 0px)) 0; }
-.brand { display: flex; align-items: center; gap: 10px; font-family: var(--f-display); font-weight: 700; font-size: 18px; letter-spacing: -0.01em; color: #fff; text-decoration: none; }
-.brand .mark { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: linear-gradient(135deg, #26b37a, #1a7fa6); box-shadow: 0 6px 20px rgb(38 179 122 / .35); }
-.navlinks { display: flex; gap: 6px; flex-wrap: wrap; }
-.navlinks a { color: #b9cddb; text-decoration: none; font-weight: 600; font-size: 13.5px; padding: 8px 12px; border-radius: 9px; }
-.navlinks a:hover { background: rgb(255 255 255 / .08); color: #fff; }
+.brand { display: flex; align-items: center; gap: 10px; font-family: var(--f-display); font-weight: 700; font-size: 18px; letter-spacing: -0.01em; color: #10283a; text-decoration: none; }
+.brand .mark { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: linear-gradient(135deg, #1fa86c, #1677c9); box-shadow: 0 6px 18px rgb(22 119 201 / .28); }
+.navlinks { display: flex; gap: 4px; flex-wrap: wrap; background: rgb(255 255 255 / .75); border: 1px solid #d6e5ee; border-radius: 12px; padding: 4px; backdrop-filter: blur(8px); }
+.navlinks a { color: #33536a; text-decoration: none; font-weight: 600; font-size: 13.5px; padding: 7px 12px; border-radius: 9px; }
+.navlinks a:hover { background: #e3f0f7; color: #0d3b57; }
 @media (max-width: 760px) { .navlinks { display: none; } }
-.hero-body { display: grid; gap: 22px; max-width: 640px; padding-block: clamp(48px, 9vw, 104px) clamp(110px, 12vw, 132px); }
-.pill { justify-self: start; display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600; color: #cfe3ef; padding: 6px 12px 6px 10px; border-radius: 999px; background: rgb(255 255 255 / .07); border: 1px solid rgb(255 255 255 / .12); backdrop-filter: blur(6px); }
-.pill i { width: 8px; height: 8px; border-radius: 50%; background: #3ddc8f; box-shadow: 0 0 0 4px rgb(61 220 143 / .18); }
-.hero h1 { font-size: clamp(34px, 5.6vw, 64px); font-weight: 800; line-height: 1.02; letter-spacing: -0.025em; }
-.hero h1 em { font-style: normal; background: linear-gradient(90deg, #3ddc8f, #4fc3e8); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.hero .lead { color: #a9c0cf; font-size: clamp(15px, 1.6vw, 17.5px); max-width: 54ch; }
+.hero-body { display: grid; gap: 22px; max-width: 640px; padding-block: clamp(48px, 9vw, 100px) clamp(110px, 12vw, 132px); }
+.pill { justify-self: start; display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600; color: #1d4a63; padding: 6px 12px 6px 10px; border-radius: 999px; background: #fff; border: 1px solid #d6e5ee; box-shadow: 0 2px 8px rgb(16 40 58 / .06); }
+.pill i { width: 8px; height: 8px; border-radius: 50%; background: #1fa86c; box-shadow: 0 0 0 4px rgb(31 168 108 / .18); }
+.hero h1 { font-size: clamp(34px, 5.6vw, 64px); font-weight: 800; line-height: 1.02; letter-spacing: -0.025em; color: #0d2537; }
+.hero h1 em { font-style: normal; background: linear-gradient(90deg, #12a067, #1677c9); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero .lead { color: #46627a; font-size: clamp(15px, 1.6vw, 17.5px); max-width: 54ch; }
 .cta { display: flex; flex-wrap: wrap; gap: 10px; }
 .cta a { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; font-weight: 700; font-size: 14.5px; padding: 12px 18px; border-radius: 12px; }
-.cta .primary { background: #26b37a; color: #04140c; box-shadow: 0 10px 28px rgb(38 179 122 / .35); }
-.cta .primary:hover { background: #3ddc8f; }
-.cta .ghost { color: #e6f0f6; background: rgb(255 255 255 / .06); border: 1px solid rgb(255 255 255 / .16); }
-.cta .ghost:hover { background: rgb(255 255 255 / .12); }
+.cta .primary { background: linear-gradient(135deg, #17a86a, #138a59); color: #fff; box-shadow: 0 10px 26px rgb(23 168 106 / .30); }
+.cta .primary:hover { background: #138a59; }
+.cta .ghost { color: #0d3b57; background: #fff; border: 1px solid #cfe0ea; box-shadow: 0 2px 8px rgb(16 40 58 / .06); }
+.cta .ghost:hover { border-color: #1677c9; }
 .kpis { position: relative; z-index: 2; margin-top: -76px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--surface); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 18px 50px rgb(8 25 40 / .18); overflow: hidden; }
 @media (max-width: 860px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .kpi { display: flex; gap: 14px; align-items: center; padding: 20px 22px; min-width: 0; }
@@ -364,14 +364,14 @@ function init() {
 
   // banner: harta intunecata, fara interactiune, cu toate licitatiile ca puncte luminoase
   const hm = L.map('heromap', { zoomControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false, boxZoom: false, keyboard: false, touchZoom: false, attributionControl: true, zoomSnap: 0.25 });
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 12, className: 'darktiles' }).addTo(hm);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 12, className: 'lighttiles' }).addTo(hm);
   const wide = window.innerWidth > 900;
   hm.fitBounds([[43.6, 20.2], [48.3, 29.8]], { paddingTopLeft: [wide ? window.innerWidth * 0.38 : 0, 40], paddingBottomRight: [20, 60] });
-  const HC = { t3: '#3ddc8f', t2: '#4fc3e8', t1: '#7f93a3', tx: '#f2b84b' };
+  const HC = { t3: '#12a067', t2: '#1677c9', t1: '#8796a3', tx: '#e09a00' };
   fut.filter(r => r.lat).forEach(r => {
     const c = HC[tkey(r.term)];
-    L.circleMarker([r.lat, r.lng], { radius: 9, stroke: false, fillColor: c, fillOpacity: 0.16, interactive: false }).addTo(hm);
-    L.circleMarker([r.lat, r.lng], { radius: 3, stroke: false, fillColor: c, fillOpacity: 0.95, interactive: false }).addTo(hm);
+    L.circleMarker([r.lat, r.lng], { radius: 10, stroke: false, fillColor: c, fillOpacity: 0.18, interactive: false }).addTo(hm);
+    L.circleMarker([r.lat, r.lng], { radius: 4, color: '#fff', weight: 1.5, fillColor: c, fillOpacity: 1, interactive: false }).addTo(hm);
   });
 
   const picks = whole.filter(r => r.vs_mkt != null && r.mkt_src === 'storia' && r.profit > 5000 && !/EXCLUS/.test(r.flags)).sort((a, b) => a.vs_mkt - b.vs_mkt).slice(0, 8);
