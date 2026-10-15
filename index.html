@@ -506,7 +506,7 @@ function render() {
   cluster.clearLayers();
   rows.filter(r => r.lat).forEach(r => {
     const c = cssv('--' + tkey(r.term));
-    const m = L.circleMarker([r.lat, r.lng], { radius: 8, color: '#fff', weight: 2, fillOpacity: 0.95, fillColor: c, dashArray: r.gps_q === 'adresa' ? null : '3 3' });
+    const m = L.circleMarker([r.lat, r.lng], { radius: 8, color: '#fff', weight: 2, fillOpacity: 0.95, fillColor: c, dashArray: ['adresa', 'strada'].includes(r.gps_q) ? null : '3 3' });
     m.bindPopup(`<b>${esc(r.city)}</b><br>${esc(roomsTxt(r) || r.name)}<br><strong>${eur(r.start_eur)}</strong>${r.vs_mkt != null ? ` · ${r.vs_mkt}% din piață` : ''}<br><a href="#${r.id}" data-open="${r.id}">Deschide fișa →</a>`);
     m.on('popupopen', e => { const a = e.popup.getElement().querySelector('[data-open]'); if (a) a.addEventListener('click', ev => { ev.preventDefault(); openPanel(r); }); });
     cluster.addLayer(m);
@@ -518,7 +518,9 @@ function openPanel(r) {
   const p = document.getElementById('panel');
   const precise = r.lat != null && r.gps_q === 'adresa';
   const sv = precise ? `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${r.lat},${r.lng}&fov=55&pitch=8` : null;
-  const gm = precise ? `https://www.google.com/maps/search/?api=1&query=${r.lat},${r.lng}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.addr || (r.city + ', ' + r.county))}`;
+  const addrQ = r.addr && !/^\s*(romania|românia)?\s*$/i.test(r.addr) ? r.addr : `${r.city}, ${r.county}, România`;
+  const gm = precise ? `https://www.google.com/maps/search/?api=1&query=${r.lat},${r.lng}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addrQ)}`;
+  const PQ = { adresa: 'exactă (blocul din publicație)', strada: 'la nivel de stradă', 'aproximativ (localitate)': 'aproximativă (doar localitatea)', 'birou executor (nu e locatia reala)': 'necunoscută (punctul e biroul executorului)', lipsa: 'lipsă' };
   const c = r.comps;
   let comps = '';
   const z = r.zone;
@@ -558,8 +560,8 @@ function openPanel(r) {
       <div class="btns">
         <a class="btn primary" href="${r.pdf}" target="_blank" rel="noopener">Descarcă publicația PDF</a>
         <a class="btn" href="${r.link}" target="_blank" rel="noopener">Anunț REPES</a>
-        ${sv ? `<a class="btn sv" href="${sv}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><circle cx="12" cy="4.5" r="2.5"/><path d="M9.5 8h5a1.5 1.5 0 0 1 1.5 1.5V14h-1.6l-.6 7h-3.6l-.6-7H8V9.5A1.5 1.5 0 0 1 9.5 8z"/></svg>Street View la adresă</a>` : ''}
-        <a class="btn" href="${gm}" target="_blank" rel="noopener">${precise ? 'Hartă Google' : 'Google Maps (adresa din anunț)'}</a>
+        ${sv ? `<a class="btn sv" href="${sv}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><circle cx="12" cy="4.5" r="2.5"/><path d="M9.5 8h5a1.5 1.5 0 0 1 1.5 1.5V14h-1.6l-.6 7h-3.6l-.6-7H8V9.5A1.5 1.5 0 0 1 9.5 8z"/></svg>Street View la bloc</a><a class="btn" href="${gm}" target="_blank" rel="noopener">Hartă Google</a>`
+             : `<a class="btn sv" href="${gm}" target="_blank" rel="noopener" title="Deschide Google Maps pe adresa scrisă în publicație. Click pe poza locului pentru Street View."><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>Google Maps la adresa din publicație</a>`}
       </div>
       ${verdict}
       <div class="figs">
@@ -578,7 +580,7 @@ function openPanel(r) {
         <dt>Garanție</dt><dd><span class="num">${eur(r.guar_eur)}${r.cur === 'RON' && r.guar ? ` (${lei(r.guar)})` : ''}</span><br><span class="muted" style="font-size:12.5px">De regulă 10% din prețul de pornire. Se plătește în contul executorului, iar dovada se atașează ofertei de cumpărare, de obicei până în ziua dinaintea licitației (ofertele la prețul de pornire pot fi depuse și în ziua licitației). Se restituie dacă nu câștigi. Contul și termenul exact sunt în publicația PDF.</span></dd>
         ${r.eur_m2 ? `<dt>Preț / mp</dt><dd class="num">${nf.format(r.eur_m2)} €/mp aici · ${r.mkt_ppm ? nf.format(r.mkt_ppm) + ' €/mp în piață' : '—'}</dd>` : ''}
         <dt>Metrou</dt><dd>${r.metro ? `${esc(r.metro.name)} · ${nf.format(r.metro.m)} m (circa ${r.metro.walk_min} min pe jos)` : '—'}</dd>
-        <dt>Adresă</dt><dd>${esc(r.addr || '—')}<br><span class="muted" style="font-size:12.5px">Precizie pe hartă: ${esc(r.gps_q)}</span></dd>
+        <dt>Adresă</dt><dd>${esc(r.addr || '—')}<br><span class="muted" style="font-size:12.5px">Poziție pe hartă: ${esc(PQ[r.gps_q] || r.gps_q)}${precise ? '' : '. Butonul galben caută adresa exactă din publicație în Google Maps; de acolo, Street View e la un click.'}</span></dd>
         <dt>Riscuri</dt><dd><div class="risks" style="max-width:none">${riskChips(r.flags) || '<span class="muted">niciunul detectat automat</span>'}</div></dd>
         ${r.desc ? `<dt>Descriere</dt><dd>${esc(r.desc)}</dd>` : ''}
       </dl>
