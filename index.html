@@ -47,13 +47,13 @@ a { color: var(--accent); text-underline-offset: 2px; }
 /* banner luminos: harta deschisa a Romaniei cu toate licitatiile ca puncte colorate, text in stanga peste un voal alb-albastru */
 .hero { position: relative; background: #eaf3f8; color: #10283a; overflow: hidden; isolation: isolate; border-bottom: 1px solid #d6e5ee; }
 #heromap { position: absolute; inset: 0; z-index: -2; background: #eaf3f8; }
-#heromap .lighttiles { filter: grayscale(1) sepia(0.15) hue-rotate(170deg) saturate(1.6) brightness(1.06) contrast(0.92); opacity: 0.55; }
+#heromap .lighttiles { filter: grayscale(1) sepia(0.15) hue-rotate(170deg) saturate(1.6) brightness(1.06) contrast(0.92); opacity: 0.6; }
 #heromap .leaflet-control-attribution { background: rgb(255 255 255 / .7); color: #6a7f8f; font-size: 10px; }
 #heromap .leaflet-control-attribution a { color: #3d6e8a; }
 .hero::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
-  background: radial-gradient(1200px 600px at 85% -10%, rgb(61 220 143 / .18), transparent 60%),
-              radial-gradient(900px 500px at 100% 100%, rgb(79 195 232 / .20), transparent 60%),
-              linear-gradient(90deg, #f4f9fc 0%, rgb(244 249 252 / .95) 34%, rgb(244 249 252 / .55) 60%, rgb(244 249 252 / .10) 100%); }
+  background: radial-gradient(1000px 500px at 85% -20%, rgb(61 220 143 / .10), transparent 60%),
+              radial-gradient(800px 400px at 100% 110%, rgb(79 195 232 / .10), transparent 60%),
+              linear-gradient(90deg, #f4f9fc 0%, rgb(244 249 252 / .96) 36%, rgb(244 249 252 / .35) 56%, rgb(244 249 252 / 0) 72%); }
 .nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: calc(18px + env(safe-area-inset-top, 0px)) 0; }
 .brand { display: flex; align-items: center; gap: 10px; font-family: var(--f-display); font-weight: 700; font-size: 18px; letter-spacing: -0.01em; color: #10283a; text-decoration: none; }
 .brand .mark { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: linear-gradient(135deg, #1fa86c, #1677c9); box-shadow: 0 6px 18px rgb(22 119 201 / .28); }
@@ -371,7 +371,7 @@ function init() {
   fut.filter(r => r.lat).forEach(r => {
     const c = HC[tkey(r.term)];
     L.circleMarker([r.lat, r.lng], { radius: 10, stroke: false, fillColor: c, fillOpacity: 0.18, interactive: false }).addTo(hm);
-    L.circleMarker([r.lat, r.lng], { radius: 4, color: '#fff', weight: 1.5, fillColor: c, fillOpacity: 1, interactive: false }).addTo(hm);
+    L.circleMarker([r.lat, r.lng], { radius: 5, color: '#fff', weight: 1.5, fillColor: c, fillOpacity: 1, interactive: false }).addTo(hm);
   });
 
   const picks = whole.filter(r => r.vs_mkt != null && r.mkt_src === 'storia' && r.profit > 5000 && !/EXCLUS/.test(r.flags)).sort((a, b) => a.vs_mkt - b.vs_mkt).slice(0, 8);
