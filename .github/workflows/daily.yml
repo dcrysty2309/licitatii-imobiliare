@@ -1,0 +1,63 @@
+name: Actualizare zilnica
+
+on:
+  schedule:
+    - cron: '30 4 * * *'   # zilnic, 07:30 ora Romaniei (vara) / 06:30 (iarna)
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalez OCR si PyMuPDF
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq tesseract-ocr
+          pip install --quiet pymupdf==1.24.10
+
+      # textul OCR al publicatiilor (contine date personale ale debitorilor) si cache-urile
+      # raman doar in cache-ul privat al GitHub Actions, nu in repo
+      - name: Refac directorul de lucru din cache
+        uses: actions/cache/restore@v4
+        with:
+          path: work
+          key: work-${{ github.run_id }}
+          restore-keys: work-
+
+      - name: Rulez actualizarea
+        env:
+          TZ: Europe/Bucharest
+        run: ./pipeline/run_daily.sh
+
+      - name: Salvez directorul de lucru
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: work
+          key: work-${{ github.run_id }}
+
+      - name: Public datele noi
+        run: |
+          git config user.name "radar-licitatii[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data.json history.json
+          if git diff --cached --quiet; then
+            echo "Nicio schimbare azi."
+          else
+            git commit -m "Actualizare $(TZ=Europe/Bucharest date +%Y-%m-%d)"
+            git push
+          fi
