@@ -19,6 +19,7 @@ RATE = float(_re.search(r'currency="EUR">([\d.]+)<', _x).group(1))
 RATE_DATE = _re.search(r'<Cube date="([\d-]+)"', _x).group(1)
 print('BNR EUR', RATE, RATE_DATE)
 api = {e['id']: e for e in json.load(open(BASE + '/apts_all.json'))}
+PRECISE = json.load(open(BASE + '/geo/precise.json')) if _os.path.exists(BASE + '/geo/precise.json') else {}
 import unicodedata as _ud
 def _n(x): return _ud.normalize('NFKD', x or '').encode('ascii', 'ignore').decode().lower()
 def maps_query(e, pub=None):
@@ -75,6 +76,11 @@ for r in rows:
     o['guar_eur'] = None if gv is None else round(gv if g.get('currency') == 'EUR' else gv / RATE)
     o['addr_pub'] = r.get('addr_pub')
     o['maps_q'] = maps_query(e, r.get('addr_pub'))
+    pg = PRECISE.get(r['id'][:8]) or {}
+    if pg.get('street_alt') and pg.get('q') != 'numar':
+        # hartile cunosc adesea doar numele vechi al strazii ("fosta ...")
+        o['maps_q'] = f"Strada {pg['street_alt']}{' ' + pg['nr'] if pg.get('nr') else ''}, " + o['maps_q'].split(', ', 1)[-1] if ', ' in o['maps_q'] else o['maps_q']
+    o['geo_label'] = r.get('geo_label')
     o['pic'] = f"https://prod.executori.ro/repes/api/auctions/{e['caseId']}/{e['id']}/pictures/{pics[0]}/thumbnail" if pics else None
     o.update(id=r['id'][:8],mkt_ppm=ppm, mkt_src=src, mkt_value=mv, profit=profit, vs_mkt=vs,
              metro_m=(r['metro'] or {}).get('m') if r.get('metro') else None)

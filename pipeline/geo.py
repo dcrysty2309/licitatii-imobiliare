@@ -36,13 +36,17 @@ for r in rows:
     e = api.get(r['id'][:8])
     g = e['asset']['address'].get('gpsLocation') if e else ''
     p = PREC.get(r['id'][:8])
-    if r['gps_bej']:
-        r['gps_q'] = 'birou executor (nu e locatia reala)'
-    elif g and decimals(g) >= 4:
-        r['gps_q'] = 'adresa'
-    elif p and p['q'] in ('numar', 'strada'):
+    r['geo_label'] = p['label'] if p else None
+    if p and p['q'] in ('bloc', 'numar'):
         r['lat'], r['lng'] = p['lat'], p['lng']
-        r['gps_q'] = 'adresa' if p['q'] == 'numar' else 'strada'
+        r['gps_q'] = 'adresa'
+    elif g and decimals(g) >= 4 and not r['gps_bej']:
+        r['gps_q'] = 'adresa'
+    elif p and p['q'] == 'strada':
+        r['lat'], r['lng'] = p['lat'], p['lng']
+        r['gps_q'] = 'strada'
+    elif r['gps_bej']:
+        r['gps_q'] = 'birou executor (nu e locatia reala)'
     else:
         r['gps_q'] = 'aproximativ (localitate)'
     r['metro'] = None

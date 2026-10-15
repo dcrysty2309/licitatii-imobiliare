@@ -548,7 +548,7 @@ function openPanel(r) {
   const sv = precise ? `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${r.lat},${r.lng}&fov=55&pitch=8` : null;
   const addrQ = r.maps_q || `${r.city}, ${r.county}, România`;
   const gm = precise ? `https://www.google.com/maps/search/?api=1&query=${r.lat},${r.lng}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addrQ)}`;
-  const PQ = { adresa: 'exactă (blocul din publicație)', strada: 'la nivel de stradă', 'aproximativ (localitate)': 'aproximativă (doar localitatea)', 'birou executor (nu e locatia reala)': 'necunoscută (punctul e biroul executorului)', lipsa: 'lipsă' };
+  const PQ = { adresa: 'exactă (clădirea din publicație)', strada: 'la nivel de stradă', 'aproximativ (localitate)': 'aproximativă (doar localitatea)', 'birou executor (nu e locatia reala)': 'necunoscută (punctul e biroul executorului)', lipsa: 'lipsă' };
   const c = r.comps;
   let comps = '';
   const z = r.zone;
@@ -590,6 +590,7 @@ function openPanel(r) {
         <a class="btn" href="${r.link}" target="_blank" rel="noopener">Anunț REPES</a>
         ${sv ? `<a class="btn sv" href="${sv}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><circle cx="12" cy="4.5" r="2.5"/><path d="M9.5 8h5a1.5 1.5 0 0 1 1.5 1.5V14h-1.6l-.6 7h-3.6l-.6-7H8V9.5A1.5 1.5 0 0 1 9.5 8z"/></svg>Street View la bloc</a><a class="btn" href="${gm}" target="_blank" rel="noopener">Hartă Google</a>`
              : `<a class="btn sv" href="${gm}" target="_blank" rel="noopener" title="Deschide Google Maps pe adresa scrisă în publicație. Click pe poza locului pentru Street View."><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>Google Maps la adresa din publicație</a>`}
+        ${r.lat != null && ['adresa', 'strada'].includes(r.gps_q) ? `<a class="btn" href="https://www.openstreetmap.org/?mlat=${r.lat}&mlon=${r.lng}#map=19/${r.lat}/${r.lng}" target="_blank" rel="noopener" title="OpenStreetMap la zoom maxim: conturul blocurilor, numerele și numele lor">Hartă cu blocuri</a>` : ''}
       </div>
       ${verdict}
       <div class="figs">
