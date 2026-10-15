@@ -302,6 +302,25 @@ a.comp:hover .t { text-decoration: underline; }
 .pill-btn:hover { border-color: var(--accent); color: var(--accent); }
 .pill-btn.maps { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 35%, var(--line)); background: var(--accent-soft); }
 .pill-btn.maps:hover { background: var(--accent); color: #fff; }
+
+/* adresa si cifre: stil discret, neutru */
+#panel .addr { display: grid; gap: 8px; padding: 2px 0 14px; border-bottom: 1px solid var(--line); }
+#panel .addrline b { font-size: 17px; }
+#panel .copy { background: none; color: var(--muted); padding: 2px 4px; font-weight: 500; }
+#panel .copy:hover { color: var(--fg); }
+#panel .locrow { gap: 6px 16px; }
+#panel .locrow .apt { height: auto; padding: 0; border: 0; background: none; border-radius: 0; font-size: 14.5px; gap: 2px 8px; }
+#panel .locrow .apt em { color: var(--muted); opacity: .5; }
+.lnk { display: inline-flex; align-items: center; gap: 5px; font-size: 14px; font-weight: 500; color: var(--muted); text-decoration: none; }
+.lnk svg { opacity: .8; }
+.lnk:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.ftable { margin: 0; display: grid; }
+.ftable > div { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.ftable > div:last-child { border-bottom: 0; }
+.ftable dt { color: var(--muted); font-size: 14px; }
+.ftable dd { margin: 0; font-weight: 600; font-size: 15px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ftable dd.pos { color: var(--good); }
+.ftable dd.neg { color: var(--bad); }
 </style>
 </head>
 <body>
@@ -603,7 +622,7 @@ function openPanel(r) {
         ${r.vs_mkt != null ? `<div><span class="lbl">Față de piață</span><b class="num" style="color:${vsColor(r.vs_mkt)}">${r.vs_mkt}%</b></div>` : ''}
       </div>
 
-      <div class="box addr">
+      <div class="addr">
         <span class="lbl">Adresa</span>
         <div class="addrline"><b id="addr-text">${esc(r.maps_addr || r.addr || '—')}</b>
           <button class="copy" type="button" data-copy="${esc((r.maps_q || r.maps_addr || '').replace(/, România$/, ''))}" title="Copiază adresa în forma pe care o găsește Google Maps" aria-label="Copiază adresa"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span>Copiază</span></button>
@@ -613,18 +632,18 @@ function openPanel(r) {
         ${!L.street ? `<span class="muted small">Publicația nu menționează strada; harta arată localitatea.</span>` : !L.nr && !L.bl ? `<span class="muted small">Publicația nu menționează numărul; harta arată strada.</span>` : ''}
         <div class="locrow">
           ${parts.length ? `<div class="apt">${parts.map(([k, v]) => `<span><i>${k}</i> ${esc(v)}</span>`).join('<em>·</em>')}</div>` : ''}
-          <a class="pill-btn maps" href="${gm}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>Vezi în Google Maps</a>
-          ${sv ? `<a class="pill-btn" href="${sv}" target="_blank" rel="noopener">Street View</a>` : ''}
-          ${osm ? `<a class="pill-btn" href="${osm}" target="_blank" rel="noopener">Hartă cu blocuri</a>` : ''}
+          <a class="lnk" href="${gm}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>Vezi în Google Maps</a>
+          ${sv ? `<a class="lnk" href="${sv}" target="_blank" rel="noopener">Street View</a>` : ''}
+          ${osm ? `<a class="lnk" href="${osm}" target="_blank" rel="noopener">Hartă cu blocuri</a>` : ''}
         </div>
       </div>
 
-      <div class="figs">
-        <div class="fig"><span>Valoare de piață</span><b>${eur(r.mkt_value)}</b></div>
-        <div class="fig"><span>€/mp: tu vs zonă</span><b>${r.eur_m2 && r.mkt_ppm ? nf.format(r.eur_m2) + ' / ' + nf.format(r.mkt_ppm) : '—'}</b></div>
-        <div class="fig"><span>Profit estimat</span><b style="color:${r.profit > 10000 ? 'var(--good)' : r.profit < 0 ? 'var(--bad)' : 'inherit'}">${eur(r.profit)}</b></div>
-        <div class="fig"><span>Evaluare</span><b>${eur(r.eval_eur)}</b></div>
-      </div>
+      <dl class="ftable">
+        <div><dt>Evaluare executor</dt><dd>${eur(r.eval_eur)}</dd></div>
+        <div><dt>Valoare de piață estimată</dt><dd>${eur(r.mkt_value)}</dd></div>
+        <div><dt>Preț pe mp: licitație / zonă</dt><dd>${r.eur_m2 && r.mkt_ppm ? nf.format(r.eur_m2) + ' / ' + nf.format(r.mkt_ppm) + ' €' : '—'}</dd></div>
+        <div><dt>Profit estimat</dt><dd class="${r.profit > 0 ? 'pos' : r.profit < 0 ? 'neg' : ''}">${eur(r.profit)}</dd></div>
+      </dl>
 
       ${z ? `<div class="box">
         <span class="lbl">Zona${z.district ? ' ' + esc(z.district) : ''} · median ${nf.format(z.median_ppm)} €/mp (${z.n} anunțuri active)</span>
