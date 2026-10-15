@@ -377,6 +377,11 @@ td.pm .zl { font-size: 11.5px; opacity: .8; margin-top: 0; }
 .kc.main b { font-size: 25px; }
 .kc-sub { font-size: 12.5px; color: var(--muted); white-space: nowrap; }
 @media (max-width: 480px) { .kcards { grid-template-columns: 1fr 1fr; } .kc.main { grid-column: 1 / -1; } .kc.main + .kc { border-left: 0; } .kc:not(.main) { border-top: 1px solid var(--line); } }
+
+.ftable > div { min-height: 46px; padding: 0; align-items: center; }
+.ftable dt { font-weight: 400; }
+.ftable dd { font-weight: 500; font-size: 15px; color: var(--fg); }
+.ftable dd .alt { color: var(--muted); font-weight: 500; margin-left: 6px; }
 </style>
 </head>
 <body>
@@ -730,7 +735,7 @@ function openPanel(r) {
       </div>
 
       <dl class="ftable">
-        <div><dt>Evaluare executor ${tip('Valoarea stabilită de evaluatorul autorizat din dosarul de executare. Poate fi veche (verifică anul dosarului în publicație) sau diferită de prețul real al pieței. Sumele sunt în lei în publicație; euro e calculat cu cursul BNR de azi, nu cu echivalentul în euro scris uneori în publicație.')}</dt><dd>${eur(r.eval_eur)}${r.eval_ron ? `<span class="muted small" style="display:block;font-weight:400">${lei(r.eval_ron)}</span>` : ''}</dd></div>
+        <div><dt>Evaluare executor ${tip('Valoarea stabilită de evaluatorul autorizat din dosarul de executare. Poate fi veche (verifică anul dosarului în publicație) sau diferită de prețul real al pieței. Sumele sunt în lei în publicație; euro e calculat cu cursul BNR de azi, nu cu echivalentul în euro scris uneori în publicație.')}</dt><dd>${eur(r.eval_eur)}${r.eval_ron ? `<span class="alt">(${lei(r.eval_ron)})</span>` : ''}</dd></div>
         <div><dt>Valoare de piață estimată ${tip(`Estimare orientativă, nu evaluare: suprafața × prețul median pe mp al anunțurilor active similare ${r.mkt_src === 'estimare' ? '(aici o medie aproximativă pe oraș, lipsind anunțuri similare)' : 'din zonă (storia.ro)'}, minus 7% pentru negocierea obișnuită. Nu ține cont de starea apartamentului, etaj sau bloc.`)}</dt><dd>${eur(r.mkt_value)}</dd></div>
         <div><dt>Preț pe mp: licitație / zonă ${tip('Prețul de pornire împărțit la suprafața utilă, comparat cu mediana prețului pe mp cerut în anunțurile din zonă.')}</dt><dd>${r.eur_m2 && r.mkt_ppm ? nf.format(r.eur_m2) + ' / ' + nf.format(r.mkt_ppm) + ' €' : '—'}</dd></div>
         <div><dt>Profit estimat ${tip('Valoarea de piață estimată − prețul de pornire − renovare (220 €/mp, minim 4.000 €) − 2% costuri la cumpărare − 5% costuri la vânzare. NU include impozitul, dobânda creditului, eventuale datorii la întreținere sau costul evacuării. Prețul final la licitație poate fi mai mare decât prețul de pornire.')}</dt><dd class="${r.profit > 0 ? 'pos' : r.profit < 0 ? 'neg' : ''}">${eur(r.profit)}</dd></div>
