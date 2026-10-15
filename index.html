@@ -150,26 +150,10 @@ section[id] { scroll-margin-top: 16px; }
 .search:focus-within { border-color: var(--accent); background: var(--surface); }
 .search svg { width: 17px; height: 17px; color: var(--muted); flex: none; }
 .search input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--fg); font: 500 14.5px var(--f-body); padding: 11px 0; outline: none; }
-.seg { display: inline-flex; align-items: center; gap: 2px; background: var(--surface-2); border-radius: 11px; padding: 3px; }
-.seg .lbl { font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); padding: 0 8px 0 9px; }
-.seg label { position: relative; }
-.seg input { position: absolute; opacity: 0; pointer-events: none; }
-.seg span { display: block; font-size: 13.5px; font-weight: 600; color: var(--muted); padding: 7px 11px; border-radius: 8px; cursor: pointer; white-space: nowrap; transition: background .12s, color .12s; }
-.seg span:hover { color: var(--fg); }
-.seg input:checked + span { background: var(--surface); color: var(--fg); box-shadow: 0 1px 3px rgb(16 40 60 / .12); }
-.seg input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 1px; }
-.more { position: relative; }
-.more summary { list-style: none; display: inline-flex; align-items: center; gap: 7px; font-size: 13.5px; font-weight: 600; color: var(--fg); padding: 9px 13px; border-radius: 11px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; user-select: none; }
-.more summary::-webkit-details-marker { display: none; }
-.more summary svg { width: 16px; height: 16px; color: var(--muted); }
-.more summary .n { background: var(--accent); color: #fff; font-size: 11px; border-radius: 999px; padding: 0 6px; line-height: 18px; }
-.more[open] summary { border-color: var(--accent); }
-.more .pop { position: absolute; right: 0; top: calc(100% + 8px); z-index: 20; width: min(320px, 86vw); background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 16px 40px rgb(16 40 60 / .18); padding: 14px; display: grid; gap: 12px; }
-.pop label.f { display: grid; gap: 5px; font-size: 12px; font-weight: 600; color: var(--muted); }
-.pop select { font: 500 14px var(--f-body); color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 9px; padding: 9px 10px; }
-.pop .chk { display: flex; align-items: center; gap: 9px; font-size: 14px; color: var(--fg); cursor: pointer; }
-.pop .chk input { accent-color: var(--accent); width: 16px; height: 16px; margin: 0; }
-.pop .reset { justify-self: start; font: 600 13px var(--f-body); color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; }
+.pick { display: flex; align-items: center; gap: 8px; background: var(--surface-2); border: 1px solid transparent; border-radius: 11px; padding: 0 6px 0 12px; transition: border-color .15s; }
+.pick:focus-within { border-color: var(--accent); }
+.pick span { font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+.pick select { border: 0; background: transparent; color: var(--fg); font: 600 14px var(--f-body); padding: 10px 4px; outline: none; cursor: pointer; }
 .count { margin-left: auto; color: var(--muted); font-size: 13px; white-space: nowrap; padding-right: 6px; }
 .count b { color: var(--fg); }
 
@@ -208,8 +192,8 @@ td.r, th.r { text-align: right; }
   .toolbar { position: static; background: none; margin: 0 0 6px; padding: 0; }
   .filters { gap: 8px; }
   .search { flex-basis: 100%; }
-  .seg { flex: 1 1 100%; overflow-x: auto; }
-  .seg span { padding: 7px 9px; }
+  .pick { flex: 1 1 calc(50% - 4px); min-width: 0; }
+  .pick select { width: 100%; min-width: 0; }
   .tablebox { display: none; }
   .list { display: grid; }
   .count { width: 100%; margin-left: 0; }
@@ -232,6 +216,8 @@ td.r, th.r { text-align: right; }
 .btn:hover { border-color: var(--accent); }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
 .btn.primary:hover { background: var(--accent-strong); }
+.btn.sv { gap: 7px; background: #fbbc04; border-color: #e5a800; color: #202124; }
+.btn.sv:hover { background: #ffc934; }
 .verdict { display: flex; gap: 10px; align-items: center; padding: 12px 14px; border-radius: 12px; font-weight: 600; }
 .figs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 .fig { background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: grid; gap: 2px; }
@@ -334,30 +320,9 @@ footer p { max-width: 110ch; }
     <div class="section-head"><h2>Toate licitațiile</h2><p>Click pe un rând pentru fișa completă. Sortează din capul coloanelor.</p></div>
     <div class="toolbar">
       <div class="filters">
-        <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" id="f-q" placeholder="Caută oraș, stradă sau stație de metrou" aria-label="Caută"></label>
-        <div class="seg" role="radiogroup" aria-label="Buget">
-          <span class="lbl">Buget</span>
-          <label><input type="radio" name="budget" value="" checked><span>Orice</span></label>
-          <label><input type="radio" name="budget" value="25000"><span>&lt; 25k €</span></label>
-          <label><input type="radio" name="budget" value="50000"><span>&lt; 50k €</span></label>
-          <label><input type="radio" name="budget" value="80000"><span>&lt; 80k €</span></label>
-        </div>
-        <div class="seg" role="radiogroup" aria-label="Reducere">
-          <span class="lbl">Reducere</span>
-          <label><input type="radio" name="disc" value="0" checked><span>Toate</span></label>
-          <label><input type="radio" name="disc" value="25"><span>−25%+</span></label>
-          <label><input type="radio" name="disc" value="50"><span>−50%</span></label>
-        </div>
-        <details class="more" id="more">
-          <summary><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>Mai multe filtre <span class="n" id="more-n" hidden></span></summary>
-          <div class="pop">
-            <label class="f">Tip proprietate<select id="f-kind"><option value="apartament" selected>Apartamente</option><option value="">Toate tipurile</option><option value="casa">Case</option><option value="teren">Terenuri</option></select></label>
-            <label class="f">Județ<select id="f-county"><option value="">Toate județele</option></select></label>
-            <label class="chk"><input type="checkbox" id="f-cota" checked> Ascunde cotele-părți</label>
-            <label class="chk"><input type="checkbox" id="f-past" checked> Doar licitații viitoare</label>
-            <button class="reset" type="button" id="f-reset">Resetează filtrele</button>
-          </div>
-        </details>
+        <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" id="f-q" placeholder="Oraș, cartier, stradă sau metrou" aria-label="Caută"></label>
+        <label class="pick"><span>Buget</span><select id="f-budget"><option value="">Orice preț</option><option value="25000">Până la 25.000 €</option><option value="50000">Până la 50.000 €</option><option value="80000">Până la 80.000 €</option><option value="120000">Până la 120.000 €</option></select></label>
+        <label class="pick"><span>Reducere</span><select id="f-disc"><option value="0">Toate licitațiile</option><option value="25">Minim −25% (termen II)</option><option value="50">Doar −50% (termen III)</option></select></label>
         <span class="count" id="count"></span>
       </div>
     </div>
@@ -415,7 +380,7 @@ function miniMap(r, z = 15) {
 }
 
 let ROWS = [], map, cluster;
-fetch('data.json').then(r => r.json()).then(d => { ROWS = d.rows; const up = document.getElementById('updated'); up.dataset.d = d.updated; up.textContent = `Date actualizate pe ${d.updated}. Curs folosit: 1 € = ${d.eur} lei.`; init(); });
+fetch('data.json').then(r => r.json()).then(d => { ROWS = d.rows; const up = document.getElementById('updated'); up.dataset.d = d.updated; up.textContent = `Date actualizate pe ${d.updated}. Curs oficial BNR din ${d.eur_date}: 1 € = ${d.eur.toFixed(4).replace('.', ',')} lei.`; init(); });
 
 function init() {
   const fut = ROWS.filter(r => r.date.slice(0, 10) >= TODAY);
@@ -461,8 +426,6 @@ function init() {
     </button>`).join('');
   document.querySelectorAll('#picks .card').forEach(c => c.addEventListener('click', () => openPanel(byId(c.dataset.id))));
 
-  const fc = document.getElementById('f-county');
-  [...new Set(ROWS.map(r => r.county).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'ro')).forEach(c => fc.insertAdjacentHTML('beforeend', `<option>${esc(c)}</option>`));
 
   map = L.map('map', { scrollWheelZoom: false }).setView([45.9, 24.9], 7);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(map);
@@ -471,13 +434,7 @@ function init() {
   map.on('click', () => map.scrollWheelZoom.enable());
 
   buildHead();
-  ['f-kind', 'f-county', 'f-q', 'f-cota', 'f-past'].forEach(id => document.getElementById(id).addEventListener('input', render));
-  document.querySelectorAll('input[name=budget], input[name=disc]').forEach(el => el.addEventListener('change', render));
-  document.getElementById('f-reset').addEventListener('click', () => {
-    document.getElementById('f-kind').value = 'apartament'; document.getElementById('f-county').value = '';
-    document.getElementById('f-cota').checked = true; document.getElementById('f-past').checked = true; render();
-  });
-  document.addEventListener('click', e => { const m = document.getElementById('more'); if (m.open && !m.contains(e.target)) m.open = false; });
+  ['f-q', 'f-budget', 'f-disc'].forEach(id => document.getElementById(id).addEventListener('input', render));
   render();
   const h = location.hash.slice(1);
   if (h && byId(h)) openPanel(byId(h));
@@ -500,16 +457,12 @@ function buildHead() {
 }
 
 function filtered() {
-  const kind = document.getElementById('f-kind').value, county = document.getElementById('f-county').value;
-  const max = parseFloat(document.querySelector('input[name=budget]:checked').value) || Infinity;
-  const disc = parseInt(document.querySelector('input[name=disc]:checked').value, 10);
+  const max = parseFloat(document.getElementById('f-budget').value) || Infinity;
+  const disc = parseInt(document.getElementById('f-disc').value, 10);
   const q = document.getElementById('f-q').value.trim().toLowerCase();
-  const hideC = document.getElementById('f-cota').checked, fut = document.getElementById('f-past').checked;
-  const extra = (kind !== 'apartament') + !!county + !hideC + !fut;
-  const n = document.getElementById('more-n'); n.hidden = !extra; n.textContent = extra;
-  return ROWS.filter(r => (!kind || r.kind === kind) && r.start_eur <= max && (!county || r.county === county)
-    && (!disc || (r.discount != null && r.discount >= disc - 1)) && (!hideC || !isCota(r)) && (!fut || r.date.slice(0, 10) >= TODAY)
-    && (!q || [r.city, r.addr, r.name, r.desc, r.county, r.metro && r.metro.name].join(' ').toLowerCase().includes(q)));
+  return ROWS.filter(r => r.kind === 'apartament' && !isCota(r) && !/EXCLUS/.test(r.flags || '') && r.date.slice(0, 10) >= TODAY && r.start_eur <= max
+    && (!disc || (r.discount != null && r.discount >= disc - 1))
+    && (!q || [r.city, r.addr, r.name, r.desc, r.county, r.metro && r.metro.name, r.zone && r.zone.district].join(' ').toLowerCase().includes(q)));
 }
 
 function vsCell(r) {
@@ -563,8 +516,9 @@ function render() {
 function openPanel(r) {
   if (!r) return;
   const p = document.getElementById('panel');
-  const gm = r.lat ? `https://www.google.com/maps/search/?api=1&query=${r.lat},${r.lng}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.addr || r.city)}`;
-  const sv = r.lat ? `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${r.lat},${r.lng}` : null;
+  const precise = r.lat != null && r.gps_q === 'adresa';
+  const sv = precise ? `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${r.lat},${r.lng}&fov=55&pitch=8` : null;
+  const gm = precise ? `https://www.google.com/maps/search/?api=1&query=${r.lat},${r.lng}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.addr || (r.city + ', ' + r.county))}`;
   const c = r.comps;
   let comps = '';
   const z = r.zone;
@@ -604,8 +558,8 @@ function openPanel(r) {
       <div class="btns">
         <a class="btn primary" href="${r.pdf}" target="_blank" rel="noopener">Descarcă publicația PDF</a>
         <a class="btn" href="${r.link}" target="_blank" rel="noopener">Anunț REPES</a>
-        <a class="btn" href="${gm}" target="_blank" rel="noopener">Google Maps</a>
-        ${sv ? `<a class="btn" href="${sv}" target="_blank" rel="noopener">Street View</a>` : ''}
+        ${sv ? `<a class="btn sv" href="${sv}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><circle cx="12" cy="4.5" r="2.5"/><path d="M9.5 8h5a1.5 1.5 0 0 1 1.5 1.5V14h-1.6l-.6 7h-3.6l-.6-7H8V9.5A1.5 1.5 0 0 1 9.5 8z"/></svg>Street View la adresă</a>` : ''}
+        <a class="btn" href="${gm}" target="_blank" rel="noopener">${precise ? 'Hartă Google' : 'Google Maps (adresa din anunț)'}</a>
       </div>
       ${verdict}
       <div class="figs">
