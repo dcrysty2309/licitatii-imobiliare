@@ -54,6 +54,7 @@ a { color: var(--accent); text-underline-offset: 2px; }
   background: radial-gradient(1000px 500px at 85% -20%, rgb(61 220 143 / .10), transparent 60%),
               radial-gradient(800px 400px at 100% 110%, rgb(79 195 232 / .10), transparent 60%),
               linear-gradient(90deg, #f4f9fc 0%, rgb(244 249 252 / .96) 36%, rgb(244 249 252 / .35) 56%, rgb(244 249 252 / 0) 72%); }
+@media (max-width: 760px) { .hero::before { background: linear-gradient(180deg, rgb(244 249 252 / .93) 0%, rgb(244 249 252 / .88) 100%); } }
 .nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: calc(18px + env(safe-area-inset-top, 0px)) 0; }
 .brand { display: flex; align-items: center; gap: 10px; font-family: var(--f-display); font-weight: 700; font-size: 18px; letter-spacing: -0.01em; color: #10283a; text-decoration: none; }
 .brand .mark { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: linear-gradient(135deg, #1fa86c, #1677c9); box-shadow: 0 6px 18px rgb(22 119 201 / .28); }
