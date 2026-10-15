@@ -348,6 +348,9 @@ main > section, main > div { min-width: 0; }
 th.r { text-align: right; }
 td.r .l1, td.r .l2 { text-align: right; }
 .lbl .tip { vertical-align: -3px; }
+
+.prop .l2.pl2 { white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+.ptype.ic { padding: 2px 4px; border-radius: 5px; background: var(--surface-2); border: 1px solid var(--line); }
 </style>
 </head>
 <body>
@@ -577,7 +580,7 @@ const underTxt = r => { const u = under(r); return u == null ? '—' : u >= 0 ? 
 const underChip = r => r.vs_mkt == null ? '<span class="dash">—</span>' : `<span class="disc" style="color:${vsColor(r.vs_mkt)};background:color-mix(in srgb, ${vsColor(r.vs_mkt)} 12%, transparent)">${underTxt(r)}</span>`;
 const ICON_APT = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="M9 7h.01M15 7h.01M9 11h.01M15 11h.01M9 15h.01M15 15h.01M10.5 21v-3h3v3"/></svg>';
 const ICON_HOUSE = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>';
-const typeIcon = r => r.kind === 'casa' ? `<span class="ptype">${ICON_HOUSE}Casă</span>` : r.kind === 'apartament' ? `<span class="ptype">${ICON_APT}Apartament</span>` : '';
+const typeIcon = (r, short) => r.kind === 'casa' ? `<span class="ptype${short ? ' ic' : ''}" title="Casă">${ICON_HOUSE}${short ? '' : 'Casă'}</span>` : r.kind === 'apartament' ? `<span class="ptype${short ? ' ic' : ''}" title="Apartament">${ICON_APT}${short ? '' : 'Apartament'}</span>` : '';
 function discTip(r) {
   if (r.vs_mkt == null) return '';
   const z = r.zone && r.zone.status === 'ok' ? r.zone : null;
@@ -602,7 +605,7 @@ function render() {
   const profitHtml = r => r.profit == null ? '<span class="dash">—</span>' : `<span class="profit num" style="color:${r.profit > 10000 ? 'var(--good)' : r.profit < 0 ? 'var(--bad)' : 'var(--fg)'}">${eur(r.profit)}</span>`;
   document.getElementById('tbody').innerHTML = rows.map(r => `<tr data-id="${r.id}" tabindex="0">
     <td><span class="l1">${fmtDate(r.date)}</span><span class="l2">${termChip(r.term)}</span></td>
-    <td class="prop"><span class="l1">${esc(r.city)}<small>${esc(r.county)}</small> ${newChip(r)}${chgChip(r)}</span><span class="l2">${typeIcon(r)}${roomsTxt(r) ? ' · ' + esc(roomsTxt(r)) : ''}</span></td>
+    <td class="prop"><span class="l1">${esc(r.city)}<small>${esc(r.county)}</small> ${newChip(r)}${chgChip(r)}</span><span class="l2 pl2">${typeIcon(r, true)}${esc(roomsTxt(r) || '')}</span></td>
     <td class="r"><span class="l1 price1 num">${eur(r.start_eur)}</span><span class="l2 num">garanție ${eur(r.guar_eur)}</span></td>
     <td class="r">${vsCell(r)}</td>
     <td class="r"><span class="dwrap">${underChip(r)}${r.vs_mkt != null ? tip(discTip(r), true) : ''}</span></td>
@@ -654,7 +657,7 @@ function openPanel(r) {
     <div class="inner">
       <div class="title">
         <div>
-          <h2>${esc(r.city)}${roomsTxt(r) ? ' · ' + esc(roomsTxt(r)) : ''} ${newChip(r)}</h2>
+          <h2>${esc(r.city)}${roomsTxt(r) ? ' · ' + esc(roomsTxt(r)) : ''} ${newChip(r)}</h2><p class="muted small" style="margin-top:2px">${typeIcon(r)}</p>
           <p class="muted" style="margin-top:4px">${termChip(r.term)} <span style="margin-left:6px">Licitația: <b style="color:var(--fg)">${fmtDate(r.date)}, ora ${esc(r.date.slice(11))}</b></span></p>
         </div>
         <button class="xclose" type="button" data-close aria-label="Închide">×</button>
