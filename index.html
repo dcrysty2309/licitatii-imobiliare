@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Licitații imobiliare — executori</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.min.css">
+<style>
+/* Layout: harta sus + filtre; tabel dedesubt; fisa detaliata se deschide in panou lateral (pe telefon: ecran intreg) */
+:root {
+  --bg: #f4f6f8; --surface: #ffffff; --fg: #15202b; --muted: #5b6b7a; --line: #d9e0e7;
+  --accent: #1d5b86; --accent-soft: #e3eef6;
+  --good: #1c7a45; --good-soft: #e2f3e9; --warn: #9a6200; --warn-soft: #fbf0d9; --bad: #b02a22; --bad-soft: #fbe5e3;
+  --t3: #1c7a45; --t2: #1d5b86; --t1: #7a8794; --tx: #b07a00;
+  --f-display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --f-body: "Public Sans", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root {
+  --bg: #0f151b; --surface: #17212a; --fg: #e6edf3; --muted: #93a4b4; --line: #2a3845;
+  --accent: #6fb3e3; --accent-soft: #1b3346;
+  --good: #5fcf8f; --good-soft: #163626; --warn: #e6b04f; --warn-soft: #3a2d12; --bad: #f08a80; --bad-soft: #3d1c19;
+  --t3: #5fcf8f; --t2: #6fb3e3; --t1: #93a4b4; --tx: #e6b04f; color-scheme: dark } }
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 14px; line-height: 1.5; }
+.wrap { max-width: 1400px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 48px; display: grid; gap: 20px; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+h1 { font-size: clamp(24px, 4vw, 34px); }
+h2 { font-size: 19px; }
+h3 { font-size: 15px; }
+p { margin: 0; max-width: 80ch; }
+a { color: var(--accent); }
+.muted { color: var(--muted); }
+.num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+header { display: grid; gap: 8px; }
+.stats { display: flex; flex-wrap: wrap; gap: 6px 20px; color: var(--muted); }
+.stats b { color: var(--fg); font-family: var(--f-mono); font-weight: 600; }
+.info { background: var(--warn-soft); border-left: 3px solid var(--warn); padding: 10px 14px; border-radius: 4px; display: grid; gap: 4px; }
+.info p { max-width: none; }
+#map { height: min(52vh, 520px); border-radius: 8px; border: 1px solid var(--line); z-index: 0; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; color: var(--muted); font-size: 12.5px; }
+.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
+.filters { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: end; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
+.filters label { display: grid; gap: 3px; font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+.filters input, .filters select { font: 14px var(--f-body); padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--fg); min-width: 0; }
+.filters input[type=number] { width: 105px; }
+.filters .check { display: flex; gap: 6px; align-items: center; text-transform: none; letter-spacing: 0; font-size: 14px; color: var(--fg); font-weight: 500; }
+.count { margin-left: auto; color: var(--muted); }
+.tablebox { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+table { border-collapse: collapse; width: 100%; min-width: 1150px; }
+th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+th { position: sticky; top: 0; background: var(--surface); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); cursor: pointer; user-select: none; white-space: nowrap; z-index: 1; }
+th[aria-sort="ascending"]::after { content: " ▲"; }
+th[aria-sort="descending"]::after { content: " ▼"; }
+tbody tr { cursor: pointer; }
+tbody tr:hover { background: var(--accent-soft); }
+td.r, th.r { text-align: right; }
+td .sub { display: block; font-size: 12px; color: var(--muted); }
+td.what { max-width: 300px; }
+.chip { display: inline-block; font-size: 11.5px; padding: 1px 7px; border-radius: 999px; white-space: nowrap; font-weight: 600; margin: 1px 2px 1px 0; }
+.c-good { background: var(--good-soft); color: var(--good); }
+.c-warn { background: var(--warn-soft); color: var(--warn); }
+.c-bad { background: var(--bad-soft); color: var(--bad); }
+.c-info { background: var(--accent-soft); color: var(--accent); }
+.c-mute { color: var(--muted); border: 1px solid var(--line); }
+/* panou detalii */
+#panel { position: fixed; top: 0; right: 0; bottom: 0; width: min(560px, 100vw); background: var(--surface); border-left: 1px solid var(--line); box-shadow: -8px 0 24px rgb(0 0 0 / 0.12); overflow-y: auto; z-index: 1000; padding: calc(16px + env(safe-area-inset-top, 0px)) 20px calc(24px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 16px; align-content: start; }
+#panel .top { display: flex; justify-content: space-between; gap: 12px; align-items: start; }
+#panel button.close { font: 600 14px var(--f-body); border: 1px solid var(--line); background: var(--bg); color: var(--fg); border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+.kv { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; min-width: 0; }
+.btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; font-weight: 600; font-size: 13.5px; padding: 7px 12px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.box { border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; display: grid; gap: 8px; }
+.comp { display: grid; gap: 2px; padding-block: 6px; border-top: 1px dashed var(--line); }
+.comp:first-of-type { border-top: 0; }
+.verdict { font-weight: 600; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, th:focus-visible, tr:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.foot { color: var(--muted); font-size: 13px; display: grid; gap: 6px; }
+.leaflet-popup-content { font-family: var(--f-body); font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Licitații imobiliare — executori judecătorești</h1>
+    <p class="muted">Toate anunțurile din categoria „Apartament” de pe REPES (registrul executorilor). Pentru fiecare: publicația PDF citită automat, locația pe hartă, distanța la metrou (București) și anunțuri similare de pe storia.ro.</p>
+    <div class="stats" id="stats"></div>
+  </header>
+
+  <div class="info">
+    <p><b>Prețul de piață vine din anunțuri reale de pe storia.ro</b> (aceeași localitate, același număr de camere, suprafață apropiată), prețuri cerute la data actualizării. Prețul cerut e de obicei cu 5–10% peste prețul final de vânzare.</p>
+    <p>Termen I = 100% din evaluare · Termen II = 75% · Termen III = 50%. Citește întotdeauna publicația PDF completă înainte să depui garanția de 10%.</p>
+  </div>
+
+  <div id="map" role="region" aria-label="Harta licitațiilor"></div>
+  <div class="legend">
+    <span><i class="dot" style="background:var(--t3)"></i>Termen III (−50%)</span>
+    <span><i class="dot" style="background:var(--t2)"></i>Termen II (−25%)</span>
+    <span><i class="dot" style="background:var(--t1)"></i>Termen I</span>
+    <span><i class="dot" style="background:var(--tx)"></i>Termen neclar</span>
+    <span>Punctele cu contur întrerupt au locație aproximativă.</span>
+  </div>
+
+  <div class="filters">
+    <label>Tip<select id="f-kind"><option value="">Toate</option><option value="apartament" selected>Apartamente</option><option value="casa">Case</option><option value="teren">Terenuri</option></select></label>
+    <label>Preț maxim (€)<input type="number" id="f-max" placeholder="oricât" step="5000" min="0"></label>
+    <label>Reducere<select id="f-disc"><option value="0">Oricare</option><option value="25">Min. 25%</option><option value="50">Min. 50%</option></select></label>
+    <label>Județ<select id="f-county"><option value="">Toate</option></select></label>
+    <label>Caută<input type="search" id="f-q" placeholder="oraș, stradă, metrou…"></label>
+    <label class="check"><input type="checkbox" id="f-cota"> Ascunde cote-părți</label>
+    <label class="check"><input type="checkbox" id="f-past" checked> Doar licitații viitoare</label>
+    <span class="count" id="count"></span>
+  </div>
+
+  <div class="tablebox">
+    <table>
+      <thead><tr id="thead"></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="foot">
+    <p>Surse: <a href="https://prod.executori.ro/repes/" target="_blank" rel="noopener">REPES — Registrul electronic de publicitate a vânzării bunurilor (UNEJ)</a> · anunțuri comparabile: <a href="https://www.storia.ro" target="_blank" rel="noopener">storia.ro</a> · stații de metrou: Wikidata · hartă: © OpenStreetMap.</p>
+    <p id="updated"></p>
+    <p>Profitul estimat = valoare de piață − preț de pornire − renovare (220 €/mp, minim 4.000 €) − costuri (2% la cumpărare, 5% la vânzare). Nu include impozitul și nici costul creditului. Semnalele de risc sunt detectate automat și pot avea erori.</p>
+  </div>
+</div>
+
+<aside id="panel" hidden aria-label="Detalii licitație"></aside>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
+<script>
+const eur = v => v == null ? '—' : Math.round(v).toLocaleString('ro-RO') + ' €';
+const lei = v => v == null ? '' : Math.round(v).toLocaleString('ro-RO') + ' lei';
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const termColor = t => t.startsWith('III') ? css('--t3') : t.startsWith('II') ? css('--t2') : t.startsWith('I ') ? css('--t1') : css('--tx');
+const termChip = t => t.startsWith('III') ? `<span class="chip c-good">${t}</span>` : t.startsWith('II') ? `<span class="chip c-info">${t}</span>` : t.startsWith('I ') ? `<span class="chip c-mute">${t}</span>` : `<span class="chip c-warn">${t}</span>`;
+const isCota = r => /^cota-parte(,|$)/.test(r.flags) || /, cota-parte(,|$)/.test(r.flags);
+const flagChips = f => (f || '').split(', ').filter(Boolean).map(x => `<span class="chip ${/EXCLUS|^cota-parte$|uzufruct|TVA|decedat|abitatie/.test(x) ? 'c-bad' : 'c-warn'}">${esc(x)}</span>`).join('');
+const TODAY = new Date().toISOString().slice(0, 10);
+
+let ROWS = [], map, cluster, markers = {};
+
+fetch('data.json').then(r => r.json()).then(d => {
+  ROWS = d.rows;
+  document.getElementById('updated').textContent = 'Date actualizate: ' + d.updated + '. Curs: 1 € = ' + d.eur + ' lei.';
+  init();
+});
+
+function init() {
+  const apts = ROWS.filter(r => r.kind === 'apartament');
+  const fut = ROWS.filter(r => r.date.slice(0, 10) >= TODAY);
+  document.getElementById('stats').innerHTML =
+    `<span><b>${ROWS.length}</b> licitații</span><span><b>${fut.length}</b> viitoare</span><span><b>${apts.length}</b> apartamente</span><span><b>${ROWS.filter(r => r.comps && r.comps.status === 'ok').length}</b> cu anunțuri similare</span><span><b>${ROWS.filter(r => r.term.startsWith('III')).length}</b> la −50%</span>`;
+  const fc = document.getElementById('f-county');
+  [...new Set(ROWS.map(r => r.county).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'ro')).forEach(c => fc.insertAdjacentHTML('beforeend', `<option>${esc(c)}</option>`));
+
+  map = L.map('map', { scrollWheelZoom: false }).setView([45.9, 24.9], 7);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(map);
+  cluster = L.markerClusterGroup({ maxClusterRadius: 40 });
+  map.addLayer(cluster);
+  map.on('click', () => map.scrollWheelZoom.enable());
+
+  buildHead();
+  ['f-kind', 'f-max', 'f-disc', 'f-county', 'f-q', 'f-cota', 'f-past'].forEach(id => document.getElementById(id).addEventListener('input', render));
+  render();
+  const h = location.hash.slice(1);
+  if (h) { const r = ROWS.find(x => x.id === h); if (r) openPanel(r); }
+}
+
+const COLS = [
+  ['date', 'Licitația'], ['city', 'Localitate'], ['name', 'Ce se vinde'], ['sqm', 'mp', 'r'], ['start_eur', 'Pornire', 'r'],
+  ['eval_eur', 'Evaluare', 'r'], ['term', 'Termen'], ['eur_m2', '€/mp', 'r'], ['mkt_ppm', 'Piață €/mp', 'r'],
+  ['vs_mkt', 'Preț vs piață', 'r'], ['profit', 'Profit est.', 'r'], ['metro_m', 'Metrou', 'r'], ['flags', 'Riscuri']
+];
+let sortKey = 'vs_mkt', sortDir = 1;
+function buildHead() {
+  const thead = document.getElementById('thead');
+  thead.innerHTML = COLS.map(([k, l, c]) => `<th data-k="${k}" class="${c || ''}" scope="col" tabindex="0">${l}</th>`).join('');
+  thead.querySelectorAll('th').forEach(th => {
+    const go = () => { const k = th.dataset.k; sortDir = sortKey === k ? -sortDir : (['date', 'city', 'name', 'term', 'flags', 'vs_mkt', 'metro_m', 'eur_m2', 'start_eur'].includes(k) ? 1 : -1); sortKey = k; render(); };
+    th.addEventListener('click', go);
+    th.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+  });
+}
+
+function filtered() {
+  const kind = document.getElementById('f-kind').value;
+  const max = parseFloat(document.getElementById('f-max').value) || Infinity;
+  const disc = parseInt(document.getElementById('f-disc').value, 10);
+  const county = document.getElementById('f-county').value;
+  const q = document.getElementById('f-q').value.trim().toLowerCase();
+  const hideC = document.getElementById('f-cota').checked;
+  const fut = document.getElementById('f-past').checked;
+  return ROWS.filter(r => (!kind || r.kind === kind) && r.start_eur <= max && (!county || r.county === county)
+    && (!disc || (r.discount != null && r.discount >= disc - 1)) && (!hideC || !isCota(r)) && (!fut || r.date.slice(0, 10) >= TODAY)
+    && (!q || (r.city + ' ' + r.addr + ' ' + r.name + ' ' + r.desc + ' ' + r.county + ' ' + (r.metro ? r.metro.name : '')).toLowerCase().includes(q)));
+}
+
+function render() {
+  const rows = filtered();
+  rows.sort((a, b) => {
+    const x = a[sortKey], y = b[sortKey];
+    if (x == null && y == null) return 0; if (x == null) return 1; if (y == null) return -1;
+    return (typeof x === 'number' ? x - y : String(x).localeCompare(String(y), 'ro')) * sortDir;
+  });
+  document.querySelectorAll('#thead th').forEach(th => th.setAttribute('aria-sort', th.dataset.k === sortKey ? (sortDir > 0 ? 'ascending' : 'descending') : 'none'));
+  document.getElementById('count').textContent = `${rows.length} rezultate`;
+  document.getElementById('tbody').innerHTML = rows.map(r => `<tr data-id="${r.id}" tabindex="0">
+    <td class="num">${esc(r.date.slice(0, 10))}<span class="sub">${esc(r.date.slice(11))}</span></td>
+    <td>${esc(r.city)}<span class="sub">${esc(r.county)}</span></td>
+    <td class="what">${esc(r.name)}${r.rooms ? `<span class="sub">${r.rooms} cam.</span>` : ''}</td>
+    <td class="r num">${r.sqm ?? '—'}</td>
+    <td class="r num">${eur(r.start_eur)}</td>
+    <td class="r num">${eur(r.eval_eur)}</td>
+    <td>${termChip(r.term)}</td>
+    <td class="r num">${r.eur_m2 ?? '—'}</td>
+    <td class="r num">${r.mkt_ppm ? r.mkt_ppm + (r.mkt_src === 'storia' ? '' : '<span class="sub">estimare</span>') : '—'}</td>
+    <td class="r num">${r.vs_mkt == null ? '—' : `<span style="color:${r.vs_mkt <= 60 ? 'var(--good)' : r.vs_mkt >= 90 ? 'var(--bad)' : 'inherit'}">${r.vs_mkt}%</span>`}</td>
+    <td class="r num">${r.profit == null ? '—' : `<span style="color:${r.profit > 10000 ? 'var(--good)' : r.profit < 0 ? 'var(--bad)' : 'inherit'}">${eur(r.profit)}</span>`}</td>
+    <td class="r num">${r.metro ? `${(r.metro.m / 1000).toFixed(1)} km<span class="sub">${esc(r.metro.name)}</span>` : '—'}</td>
+    <td>${flagChips(r.flags)}</td>
+  </tr>`).join('') || `<tr><td colspan="${COLS.length}" class="muted">Niciun rezultat. Schimbă filtrele de mai sus.</td></tr>`;
+  document.querySelectorAll('#tbody tr[data-id]').forEach(tr => {
+    const open = () => openPanel(ROWS.find(x => x.id === tr.dataset.id));
+    tr.addEventListener('click', open);
+    tr.addEventListener('keydown', e => { if (e.key === 'Enter') open(); });
+  });
+  // map
+  cluster.clearLayers(); markers = {};
+  rows.filter(r => r.lat).forEach(r => {
+    const m = L.circleMarker([r.lat, r.lng], { radius: 8, color: termColor(r.term), weight: 2, fillOpacity: 0.75, fillColor: termColor(r.term), dashArray: r.gps_q === 'adresa' ? null : '3 3' });
+    m.bindPopup(`<b>${esc(r.city)}</b> · ${eur(r.start_eur)}<br>${esc(r.name)}<br>${r.sqm ? r.sqm + ' mp · ' : ''}${esc(r.term)}<br><a href="#${r.id}" data-open="${r.id}">Vezi fișa</a>`);
+    m.on('popupopen', e => { const a = e.popup.getElement().querySelector('[data-open]'); if (a) a.addEventListener('click', ev => { ev.preventDefault(); openPanel(r); }); });
+    cluster.addLayer(m); markers[r.id] = m;
+  });
+}
+
+function openPanel(r) {
+  if (!r) return;
+  const p = document.getElementById('panel');
+  const gm = r.lat ? `https://www.google.com/maps/search/?api=1&query=${r.lat},${r.lng}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.addr || r.city)}`;
+  const sv = r.lat ? `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${r.lat},${r.lng}` : null;
+  const c = r.comps;
+  let compsHtml;
+  if (c && c.status === 'ok') {
+    compsHtml = `<div class="box"><h3>Anunțuri similare pe storia.ro</h3>
+      <p class="muted">${c.n} anunțuri găsite la nivel de ${esc(c.level)} (filtre: ${esc(c.filters || 'doar localitate')}). Preț median cerut: <b class="num">${c.median_ppm} €/mp</b>.</p>
+      ${c.items.map(i => `<div class="comp"><a href="${i.url}" target="_blank" rel="noopener">${esc(i.title)}</a><span class="muted num">${eur(i.price)} · ${i.area} mp · ${Math.round(i.price / i.area)} €/mp${i.zone ? ' · ' + esc(i.zone) : ''}</span></div>`).join('')}
+      <a href="${c.search_url}" target="_blank" rel="noopener">Vezi toată căutarea pe storia.ro</a></div>`;
+  } else if (c) {
+    compsHtml = `<div class="box"><h3>Anunțuri similare</h3><p class="muted">${esc(c.status)}. Caută manual în zonă.</p></div>`;
+  } else compsHtml = '';
+  let verdict = '';
+  if (r.vs_mkt != null) {
+    verdict = r.vs_mkt <= 55 ? 'Preț de pornire foarte mic față de piață.' : r.vs_mkt <= 70 ? 'Preț de pornire bun față de piață.' : r.vs_mkt <= 85 ? 'Reducere mică față de piață.' : 'Aproape de prețul pieței: nu e o afacere.';
+  }
+  p.innerHTML = `
+    <div class="top"><div><h2>${esc(r.name)}</h2><p class="muted">${esc(r.city)}, ${esc(r.county)}</p></div><button class="close" type="button" id="close">Închide</button></div>
+    <div class="btns">
+      <a class="btn primary" href="${r.pdf}" target="_blank" rel="noopener">Descarcă publicația (PDF)</a>
+      <a class="btn" href="${r.link}" target="_blank" rel="noopener">Anunțul pe REPES</a>
+      <a class="btn" href="${gm}" target="_blank" rel="noopener">Google Maps</a>
+      ${sv ? `<a class="btn" href="${sv}" target="_blank" rel="noopener">Street View</a>` : ''}
+    </div>
+    ${verdict ? `<p class="verdict" style="color:${r.vs_mkt <= 70 ? 'var(--good)' : r.vs_mkt <= 85 ? 'var(--warn)' : 'var(--bad)'}">${verdict}</p>` : ''}
+    <dl class="kv">
+      <dt>Licitația</dt><dd class="num">${esc(r.date)}</dd>
+      <dt>Preț de pornire</dt><dd class="num">${eur(r.start_eur)} ${r.cur === 'RON' ? `<span class="muted">(${lei(r.start)})</span>` : ''}</dd>
+      <dt>Evaluare</dt><dd class="num">${eur(r.eval_eur)}</dd>
+      <dt>Termen</dt><dd>${termChip(r.term)}</dd>
+      <dt>Suprafață</dt><dd class="num">${r.sqm ? r.sqm + ' mp' : '—'}${r.rooms ? ' · ' + r.rooms + ' camere' : ''}</dd>
+      <dt>Preț / mp</dt><dd class="num">${r.eur_m2 ? r.eur_m2 + ' €/mp' : '—'}</dd>
+      <dt>Piață / mp</dt><dd class="num">${r.mkt_ppm ? r.mkt_ppm + ' €/mp' + (r.mkt_src === 'storia' ? ' (storia.ro)' : ' (estimare)') : '—'}</dd>
+      <dt>Valoare de piață</dt><dd class="num">${eur(r.mkt_value)}</dd>
+      <dt>Profit estimat</dt><dd class="num">${eur(r.profit)}</dd>
+      <dt>Metrou</dt><dd>${r.metro ? `${esc(r.metro.name)} · ${r.metro.m} m (~${r.metro.walk_min} min pe jos)` : '—'}</dd>
+      <dt>Locație</dt><dd>${esc(r.addr || '—')}<span class="muted"> · precizie: ${esc(r.gps_q)}</span></dd>
+      <dt>Riscuri</dt><dd>${flagChips(r.flags) || '<span class="muted">niciunul detectat automat</span>'}</dd>
+      ${r.note ? `<dt>Verificat</dt><dd>${esc(r.note)}</dd>` : ''}
+      ${r.desc ? `<dt>Descriere</dt><dd>${esc(r.desc)}</dd>` : ''}
+    </dl>
+    ${compsHtml}
+    <p class="muted" style="font-size:12.5px">Sursă: publicația executorului judecătoresc pe REPES (prod.executori.ro). Comparabile: storia.ro, prețuri cerute.</p>`;
+  p.hidden = false;
+  history.replaceState(null, '', '#' + r.id);
+  document.getElementById('close').addEventListener('click', closePanel);
+  document.getElementById('close').focus();
+  if (r.lat) { map.setView([r.lat, r.lng], Math.max(map.getZoom(), 14)); }
+}
+function closePanel() { document.getElementById('panel').hidden = true; history.replaceState(null, '', location.pathname); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
+</script>
+</body>
+</html>
