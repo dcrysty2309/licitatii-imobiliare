@@ -282,10 +282,9 @@ footer p { max-width: 110ch; }
 .addrline b { font-size: 16.5px; }
 .copy { display: inline-flex; align-items: center; gap: 5px; font: 600 12.5px var(--f-body); color: var(--accent); background: var(--accent-soft); border: 0; border-radius: 8px; padding: 5px 9px; cursor: pointer; }
 .copy:hover { filter: brightness(.96); }
-.apt { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-.apt div { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 7px 10px; }
-.apt span { display: block; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; font-weight: 700; }
-.apt b { font-family: var(--f-display); font-size: 18px; }
+.apt { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 2px 10px; justify-self: start; background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font-size: 15px; font-weight: 700; }
+.apt i { font-style: normal; font-weight: 500; color: var(--muted); font-size: 13px; }
+.apt em { font-style: normal; color: var(--line); }
 #panel .figs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 #panel .fig b { font-size: 18px; }
 a.comp { display: grid; gap: 1px; padding: 9px 0 0; border-top: 1px solid var(--line); text-decoration: none; color: inherit; }
@@ -574,7 +573,7 @@ function openPanel(r) {
   const gm = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.maps_q || r.maps_addr || (r.city + ', ' + r.county + ', România'))}`;
   const sv = exact ? `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${r.lat},${r.lng}&fov=55&pitch=8` : null;
   const osm = r.lat != null && ['adresa', 'strada'].includes(r.gps_q) ? `https://www.openstreetmap.org/?mlat=${r.lat}&mlon=${r.lng}#map=19/${r.lat}/${r.lng}` : null;
-  const parts = [['Bloc', L.bl], ['Scara', L.sc], ['Etaj', L.et], ['Ap.', L.ap]].filter(x => x[1]);
+  const parts = [['Bl.', L.bl], ['Sc.', L.sc], ['Et.', L.et], ['Ap.', L.ap]].filter(x => x[1]);
   const z = r.zone && r.zone.status === 'ok' ? r.zone : null;
   const ago = d => d <= 1 ? 'azi' : d < 31 ? `acum ${d} zile` : `acum ${Math.round(d / 30)} luni`;
   const dist = m => m < 1000 ? `${m} m` : `${(m / 1000).toFixed(1).replace('.', ',')} km`;
@@ -602,7 +601,7 @@ function openPanel(r) {
         </div>
         ${L.street_alt ? (() => { const gq = (r.maps_q || '').replace(/, România$/, ''); const viaOld = gq && gq !== r.maps_addr;
           return `<span class="muted small">Fostă ${esc(L.type || 'Strada')} ${esc(L.street_alt)}.${viaOld ? ` În Google Maps strada apare încă cu numele vechi, așa că butonul caută <b style="color:var(--fg)">${esc(gq)}</b> (aceeași clădire).` : ''}</span>`; })() : ''}
-        ${parts.length ? `<div class="apt">${parts.map(([k, v]) => `<div><span>${k}</span><b>${esc(v)}</b></div>`).join('')}</div>` : ''}
+        ${parts.length ? `<div class="apt">${parts.map(([k, v]) => `<span><i>${k}</i> ${esc(v)}</span>`).join('<em>·</em>')}</div>` : ''}
         ${!L.street ? `<span class="muted small">Publicația nu menționează strada; harta arată localitatea.</span>` : !L.nr && !L.bl ? `<span class="muted small">Publicația nu menționează numărul; harta arată strada.</span>` : ''}
         <div class="btns">
           <a class="btn sv" href="${gm}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>Google Maps</a>
