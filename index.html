@@ -398,6 +398,8 @@ td.pm .zl { font-size: 11.5px; opacity: .8; margin-top: 0; }
 .cfacts dt { color: var(--muted); }
 .cfacts dd { margin: 0; color: var(--fg); font-weight: 500; text-align: right; }
 .cfacts dd .muted { font-weight: 400; }
+
+.nodisc { font-size: 12px; color: var(--muted); border: 1px dashed var(--line); padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -440,7 +442,7 @@ td.pm .zl { font-size: 11.5px; opacity: .8; margin-top: 0; }
   <section id="oportunitati">
     <div class="section-head">
       <h2>Cele mai bune oportunități</h2>
-      <p>Apartamente întregi, cu anunțuri similare reale în aceeași localitate, ordonate după cât de jos e prețul de pornire față de piață.</p>
+      <p>Doar licitații cu preț redus față de evaluare (termen II −25% sau termen III −50%), apartamente întregi. Ordonate după reducere, apoi după cât de ieftine sunt față de anunțurile din zonă.</p>
     </div>
     <div class="picks" id="picks"></div>
   </section>
@@ -569,7 +571,7 @@ function init() {
     L.circleMarker([r.lat, r.lng], { radius: 5, color: '#fff', weight: 1.5, fillColor: c, fillOpacity: 1, interactive: false }).addTo(hm);
   });
 
-  const picks = whole.filter(r => r.vs_mkt != null && ['storia', 'zona'].includes(r.mkt_src) && r.profit > 5000 && !/EXCLUS/.test(r.flags)).sort((a, b) => a.vs_mkt - b.vs_mkt).slice(0, 8);
+  const picks = whole.filter(r => (r.discount || 0) >= 24 && r.vs_mkt != null && ['storia', 'zona'].includes(r.mkt_src) && r.profit > 5000 && !/EXCLUS/.test(r.flags)).sort((a, b) => (b.discount - a.discount) || (a.vs_mkt - b.vs_mkt)).slice(0, 8);
   document.getElementById('picks').innerHTML = picks.map(r => `
     <button class="card" type="button" data-id="${r.id}">
       <div class="mini">${miniMap(r)}<span class="badge">${termChip(r.term)}</span></div>
@@ -638,7 +640,7 @@ function discTip(r) {
   return `Prețul de pornire înseamnă ${nf.format(r.eur_m2)} €/mp. În zonă se cer în medie ${nf.format(r.mkt_ppm)} €/mp (${src}, minus 7% pentru negociere). ${underTxt(r)} arată cu cât e prețul de pornire sub această valoare. Orientativ: nu ține cont de starea apartamentului, etaj sau de faptul că licitația poate urca peste prețul de pornire.`;
 }
 const evalDisc = r => r.discount != null && r.discount > 0 ? r.discount : null;
-const evalChip = r => evalDisc(r) == null ? '<span class="dash">—</span>' : `<span class="disc ed">−${evalDisc(r)}%</span>`;
+const evalChip = r => evalDisc(r) == null ? '<span class="nodisc">fără reducere</span>' : `<span class="disc ed">−${evalDisc(r)}%</span>`;
 const mktLine = r => r.vs_mkt == null ? '' : `<span class="mkt">piață ${underTxt(r)}</span>`;
 function zoneLabel(r) { const z = r.zone && r.zone.status === 'ok' ? r.zone : null; return z ? (z.scope === 'raza' ? 'pe 1,5 km' : z.district ? z.district : 'oraș') : r.mkt_src === 'estimare' ? 'estimare' : 'oraș'; }
 function vsCell(r) {
