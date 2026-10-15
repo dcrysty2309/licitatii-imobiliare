@@ -336,6 +336,10 @@ a.comp:hover .t { text-decoration: underline; }
 
 .disc { display: inline-block; font-weight: 800; font-size: 15px; padding: 3px 10px; border-radius: 999px; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .meter .row { align-items: center; }
+
+main > section, main > div { min-width: 0; }
+.tablebox { max-width: 100%; }
+.prop .l2 { white-space: normal; }
 </style>
 </head>
 <body>
@@ -566,7 +570,7 @@ const underChip = r => r.vs_mkt == null ? '<span class="dash">—</span>' : `<sp
 function zoneLabel(r) { const z = r.zone && r.zone.status === 'ok' ? r.zone : null; return z ? (z.scope === 'raza' ? 'pe 1,5 km' : z.district ? z.district : 'oraș') : r.mkt_src === 'estimare' ? 'estimare' : 'oraș'; }
 function vsCell(r) {
   if (!r.eur_m2) return `<span class="dash">—</span>`;
-  return `<span class="l1 num">${nf.format(r.eur_m2)} €/mp</span>${r.mkt_ppm ? `<span class="l2 num">zona: ${nf.format(r.mkt_ppm)} €/mp · ${esc(zoneLabel(r))}</span>` : ''}`;
+  return `<span class="l1 num">${nf.format(r.eur_m2)} €/mp</span>${r.mkt_ppm ? `<span class="l2 num">zona ${nf.format(r.mkt_ppm)} €/mp</span><span class="l2">${esc(zoneLabel(r))}</span>` : ''}`;
 }
 
 function render() {
