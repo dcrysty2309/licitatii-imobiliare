@@ -293,6 +293,9 @@ a.comp:hover .t { text-decoration: underline; }
 .links { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; padding-top: 4px; }
 .warnbox { background: var(--warn-soft); border-color: transparent; }
 .hist summary { cursor: pointer; font-weight: 600; color: var(--muted); font-size: 13.5px; }
+.xclose { display: none; }
+@media (max-width: 600px) { .xclose { display: grid; place-items: center; flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface-2); color: var(--fg); font-size: 22px; line-height: 1; cursor: pointer; } }
+#panel:focus { outline: none; }
 </style>
 </head>
 <body>
@@ -390,7 +393,7 @@ a.comp:hover .t { text-decoration: underline; }
 </footer>
 
 <div class="scrim" id="scrim" hidden></div>
-<aside id="panel" hidden aria-label="Fișa licitației" role="dialog"></aside>
+<aside id="panel" tabindex="-1" hidden aria-label="Fișa licitației" role="dialog"></aside>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
@@ -585,7 +588,7 @@ function openPanel(r) {
           <h2>${esc(r.city)}${roomsTxt(r) ? ' · ' + esc(roomsTxt(r)) : ''} ${newChip(r)}</h2>
           <p class="muted" style="margin-top:4px">${termChip(r.term)} <span style="margin-left:6px">Licitația: <b style="color:var(--fg)">${fmtDate(r.date)}, ora ${esc(r.date.slice(11))}</b></span></p>
         </div>
-        <button class="close" type="button" data-close>Închide</button>
+        <button class="xclose" type="button" data-close aria-label="Închide">×</button>
       </div>
 
       <div class="pricebar">
@@ -643,7 +646,7 @@ function openPanel(r) {
       const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range); try { document.execCommand('copy'); done(); } catch (e) {}
     });
   }));
-  p.querySelector('[data-close]').focus();
+  p.focus();
   if (r.lat && ['adresa', 'strada'].includes(r.gps_q)) map.setView([r.lat, r.lng], Math.max(map.getZoom(), 15));
 }
 
