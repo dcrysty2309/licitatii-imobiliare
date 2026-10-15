@@ -78,6 +78,12 @@ for r in rows:
     if not street: continue
     hit, q = None, None
     names = [street] + ([alt] if alt else [])
+    # ce nume de strada exista efectiv pe harta in orasul respectiv (strazi redenumite)
+    osm_street = None
+    if alt:
+        for s in names:
+            if any(same_city(x.get('address'), city) for x in nom({'street': s, 'city': city, 'county': '' if city == 'București' else county, 'country': 'Romania'})):
+                osm_street = s; break
     # 1-2. strada (sau numele vechi) + numar
     for s in names:
         if hit or not nr: break
@@ -108,7 +114,9 @@ for r in rows:
             if hit: break
     if hit:
         out[rid] = {'lat': round(float(hit['lat']), 6), 'lng': round(float(hit['lon']), 6), 'q': q,
-                    'label': (hit.get('display_name') or '')[:160], 'street_alt': alt, 'street': street, 'nr': nr, 'bl': bl}
+                    'label': (hit.get('display_name') or '')[:160], 'street_alt': alt, 'street': street, 'nr': nr, 'bl': bl, 'osm_street': osm_street}
+    elif osm_street:
+        out[rid] = {'q': 'nume', 'osm_street': osm_street, 'street': street, 'street_alt': alt}
 json.dump(out, open(os.path.join(WORK, 'geo', 'precise.json'), 'w'), ensure_ascii=False, indent=0)
 from collections import Counter
 print('geocodare:', len(out), dict(Counter(v['q'] for v in out.values())))

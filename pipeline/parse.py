@@ -1,6 +1,9 @@
 import json, os, re, sys, unicodedata
 from common import TODAY
 from addrx import extract as extract_addr
+import json as _json
+from common import HERE as _HERE
+ADDR_MANUAL = _json.load(open(os.path.join(_HERE, 'addr_manual.json')))
 BASE = sys.argv[1]
 EUR = 5.09
 def norm(s):
@@ -135,7 +138,7 @@ for e in json.load(open(os.path.join(BASE, 'apts_all.json'))):
         eur_m2=None if not m2 else round(s_eur / m2),
         link=f"https://prod.executori.ro/repes/listing/{e['caseId']}/{e['id']}",
         pdf=f"https://prod.executori.ro/repes/api/auctions/{e['caseId']}/{e['id']}/publication/",
-        addr_pub=extract_addr(raw) if raw else None,
+        addr_pub=ADDR_MANUAL.get(e['id'][:8]) or (extract_addr(raw) if raw else None),
         kind=kind(e), flags=flags(e, text, s_eur), textlen=len(text)))
 json.dump(rows, open(os.path.join(BASE, 'rows.json'), 'w'), ensure_ascii=False, indent=0)
 from collections import Counter

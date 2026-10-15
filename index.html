@@ -269,6 +269,31 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 footer { border-top: 1px solid var(--line); padding-block: 22px 40px; color: var(--muted); font-size: 13px; }
 footer .container { display: grid; gap: 8px; }
 footer p { max-width: 110ch; }
+
+/* fisa compacta */
+#panel .inner { gap: 14px; }
+.lbl { display: block; font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+.small { font-size: 12.5px; }
+.pricebar { display: flex; flex-wrap: wrap; gap: 10px 26px; align-items: end; }
+.pricebar b { display: block; font-family: var(--f-display); font-size: 20px; font-weight: 700; }
+.pricebar b.big { font-size: 30px; line-height: 1.05; }
+.addr { gap: 8px; }
+.addrline { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.addrline b { font-size: 16.5px; }
+.copy { display: inline-flex; align-items: center; gap: 5px; font: 600 12.5px var(--f-body); color: var(--accent); background: var(--accent-soft); border: 0; border-radius: 8px; padding: 5px 9px; cursor: pointer; }
+.copy:hover { filter: brightness(.96); }
+.apt { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.apt div { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 7px 10px; }
+.apt span { display: block; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; font-weight: 700; }
+.apt b { font-family: var(--f-display); font-size: 18px; }
+#panel .figs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+#panel .fig b { font-size: 18px; }
+a.comp { display: grid; gap: 1px; padding: 9px 0 0; border-top: 1px solid var(--line); text-decoration: none; color: inherit; }
+a.comp .t { color: var(--accent); font-weight: 600; font-size: 13.5px; }
+a.comp:hover .t { text-decoration: underline; }
+.links { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; padding-top: 4px; }
+.warnbox { background: var(--warn-soft); border-color: transparent; }
+.hist summary { cursor: pointer; font-weight: 600; color: var(--muted); font-size: 13.5px; }
 </style>
 </head>
 <body>
@@ -544,92 +569,90 @@ function render() {
 function openPanel(r) {
   if (!r) return;
   const p = document.getElementById('panel');
-  const precise = r.lat != null && r.gps_q === 'adresa';
-  const sv = precise ? `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${r.lat},${r.lng}&fov=55&pitch=8` : null;
-  const addrQ = r.maps_q || `${r.city}, ${r.county}, România`;
-  const gm = precise ? `https://www.google.com/maps/search/?api=1&query=${r.lat},${r.lng}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addrQ)}`;
-  const PQ = { adresa: 'exactă (clădirea din publicație)', strada: 'la nivel de stradă', 'aproximativ (localitate)': 'aproximativă (doar localitatea)', 'birou executor (nu e locatia reala)': 'necunoscută (punctul e biroul executorului)', lipsa: 'lipsă' };
-  const c = r.comps;
-  let comps = '';
-  const z = r.zone;
-  if (z && z.status === 'ok') {
-    const lo = Math.min(z.p25 * 0.6, r.eur_m2 || z.p25) , hi = Math.max(z.p75 * 1.25, r.eur_m2 || 0);
-    const pos = v => Math.max(0, Math.min(100, (v - lo) / (hi - lo) * 100));
-    const ago = d => d <= 1 ? 'azi' : d < 31 ? `acum ${d} zile` : `acum ${Math.round(d / 30)} luni`;
-    comps = `<div class="box zone">
-      <h3>Analiza zonei${z.district ? ': ' + esc(z.district) : ''}</h3>
-      <p class="muted" style="font-size:13px">${z.n} anunțuri active pe storia.ro ${z.level === 'cartier' ? 'în cartierul ' + esc(z.district) : 'în ' + esc(z.level === 'sector' ? 'sector' : 'oraș')}, cu suprafață apropiată. Blocurile noi și cele în construcție sunt excluse.</p>
-      <div class="range" aria-label="Interval de preț în zonă">
-        <div class="track"><i class="iqr" style="left:${pos(z.p25)}%;width:${pos(z.p75) - pos(z.p25)}%"></i><i class="med" style="left:${pos(z.median_ppm)}%"></i>${r.eur_m2 ? `<i class="you" style="left:${pos(r.eur_m2)}%"></i>` : ''}</div>
-        <div class="legend2"><span><i class="k you"></i>Licitație <b class="num">${r.eur_m2 ? nf.format(r.eur_m2) + ' €/mp' : '—'}</b></span><span><i class="k med"></i>Median zonă <b class="num">${nf.format(z.median_ppm)} €/mp</b></span><span><i class="k iqr"></i>Majoritatea anunțurilor <b class="num">${nf.format(z.p25)}–${nf.format(z.p75)} €/mp</b></span></div>
-      </div>
-      <h3 style="font-size:14.5px;margin-top:4px">${z.items.length} anunțuri comparabile, verificate active</h3>
-      ${z.items.map(i => `<div class="comp"><a href="${i.url}" target="_blank" rel="noopener">${esc(i.title)}</a>
-        <span class="cmeta num">${eur(i.price)} · ${String(i.area).replace('.', ',')} mp · <b>${nf.format(Math.round(i.price / i.area))} €/mp</b></span>
-        <span class="cmeta">${i.dist != null ? `<span class="chip c-t2">la ${i.dist < 1000 ? i.dist + ' m' : (i.dist / 1000).toFixed(1).replace('.', ',') + ' km'}</span> ` : ''}<span class="chip c-ok">activ · actualizat ${ago(i.age)}</span></span></div>`).join('') || '<p class="muted">Niciun anunț activ verificat.</p>'}
-      <div class="btns" style="margin-top:4px"><a class="btn" href="${z.search_url}" target="_blank" rel="noopener">Toate anunțurile din zonă (storia.ro)</a><a class="btn" href="${z.olx_url}" target="_blank" rel="noopener">Caută pe OLX</a></div>
-      <p class="src">Verificat pe ${esc(document.getElementById('updated').dataset.d || '')}: fiecare anunț a fost deschis și avea statusul „activ”, cu ultima actualizare în ultimele 4 luni. Distanța e măsurată în linie dreaptă de la apartamentul scos la licitație.</p>
-    </div>`;
-  } else if (c && c.status === 'ok') {
-    comps = `<div class="box"><h3>Anunțuri similare pe storia.ro</h3>
-      <p class="muted" style="font-size:13px">${c.n} anunțuri la nivel de ${esc(c.level)}${c.level === 'judet' ? ' (doar orientativ, nu sunt din aceeași localitate)' : ''}. Preț median cerut: <b class="num" style="color:var(--fg)">${nf.format(c.median_ppm)} €/mp</b>.</p>
-      ${c.items.map(i => `<div class="comp"><a href="${i.url}" target="_blank" rel="noopener">${esc(i.title)}</a><span class="muted num" style="font-size:13px">${eur(i.price)} · ${i.area} mp · ${nf.format(Math.round(i.price / i.area))} €/mp${i.zone ? ' · ' + esc(i.zone) : ''}</span></div>`).join('')}
-      <a href="${c.search_url}" target="_blank" rel="noopener" style="font-size:13px">Vezi toată căutarea pe storia.ro →</a></div>`;
-  } else if (c) comps = `<div class="box"><h3>Anunțuri similare</h3><p class="muted">Nu am găsit anunțuri similare pe storia.ro. Caută manual în zonă.</p></div>`;
-  let verdict = '';
-  if (r.vs_mkt != null) {
-    const [txt, col, bg] = r.vs_mkt <= 55 ? ['Preț de pornire foarte mic față de piață', 'var(--good)', 'var(--good-soft)'] : r.vs_mkt <= 70 ? ['Preț de pornire bun față de piață', 'var(--good)', 'var(--good-soft)'] : r.vs_mkt <= 85 ? ['Reducere mică față de piață', 'var(--warn)', 'var(--warn-soft)'] : ['Aproape de prețul pieței: nu e o afacere', 'var(--bad)', 'var(--bad-soft)'];
-    verdict = `<div class="verdict" style="background:${bg};color:${col}"><span class="num" style="font-family:var(--f-display);font-size:22px">${r.vs_mkt}%</span><span>${txt}</span></div>`;
-  } else if (isCota(r)) verdict = `<div class="verdict" style="background:var(--bad-soft);color:var(--bad)">Se vinde doar o cotă-parte, nu apartamentul întreg.</div>`;
+  const L = r.loc || {};
+  const exact = r.lat != null && r.gps_q === 'adresa';
+  const gm = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.maps_q || r.maps_addr || (r.city + ', ' + r.county + ', România'))}`;
+  const sv = exact ? `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${r.lat},${r.lng}&fov=55&pitch=8` : null;
+  const osm = r.lat != null && ['adresa', 'strada'].includes(r.gps_q) ? `https://www.openstreetmap.org/?mlat=${r.lat}&mlon=${r.lng}#map=19/${r.lat}/${r.lng}` : null;
+  const parts = [['Bloc', L.bl], ['Scara', L.sc], ['Etaj', L.et], ['Ap.', L.ap]].filter(x => x[1]);
+  const z = r.zone && r.zone.status === 'ok' ? r.zone : null;
+  const ago = d => d <= 1 ? 'azi' : d < 31 ? `acum ${d} zile` : `acum ${Math.round(d / 30)} luni`;
+  const dist = m => m < 1000 ? `${m} m` : `${(m / 1000).toFixed(1).replace('.', ',')} km`;
+  const risks = riskChips(r.flags);
   p.innerHTML = `
-    ${r.lat != null || r.pic ? `<div class="mini">${miniMap(r, 16)}<span class="badge">${termChip(r.term)}</span><button class="close closefab" type="button" data-close>Închide</button></div>` : ''}
     <div class="inner">
-      <div class="title"><div><h2>${esc(r.city)} · ${esc(roomsTxt(r) || r.name)}</h2><p class="muted">${esc(r.name)} · ${esc(r.county)}</p></div>${r.lat == null && !r.pic ? '<button class="close" type="button" data-close>Închide</button>' : ''}</div>
-      <div class="btns">
-        <a class="btn primary" href="${r.pdf}" target="_blank" rel="noopener">Descarcă publicația PDF</a>
-        <a class="btn" href="${r.link}" target="_blank" rel="noopener">Anunț REPES</a>
-        ${sv ? `<a class="btn sv" href="${sv}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><circle cx="12" cy="4.5" r="2.5"/><path d="M9.5 8h5a1.5 1.5 0 0 1 1.5 1.5V14h-1.6l-.6 7h-3.6l-.6-7H8V9.5A1.5 1.5 0 0 1 9.5 8z"/></svg>Street View la bloc</a><a class="btn" href="${gm}" target="_blank" rel="noopener">Hartă Google</a>`
-             : `<a class="btn sv" href="${gm}" target="_blank" rel="noopener" title="Deschide Google Maps pe adresa scrisă în publicație. Click pe poza locului pentru Street View."><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>Google Maps la adresa din publicație</a>`}
-        ${r.lat != null && ['adresa', 'strada'].includes(r.gps_q) ? `<a class="btn" href="https://www.openstreetmap.org/?mlat=${r.lat}&mlon=${r.lng}#map=19/${r.lat}/${r.lng}" target="_blank" rel="noopener" title="OpenStreetMap la zoom maxim: conturul blocurilor, numerele și numele lor">Hartă cu blocuri</a>` : ''}
+      <div class="title">
+        <div>
+          <h2>${esc(r.city)}${roomsTxt(r) ? ' · ' + esc(roomsTxt(r)) : ''} ${newChip(r)}</h2>
+          <p class="muted" style="margin-top:4px">${termChip(r.term)} <span style="margin-left:6px">Licitația: <b style="color:var(--fg)">${fmtDate(r.date)}, ora ${esc(r.date.slice(11))}</b></span></p>
+        </div>
+        <button class="close" type="button" data-close>Închide</button>
       </div>
-      ${verdict}
+
+      <div class="pricebar">
+        <div><span class="lbl">Preț de pornire</span><b class="big num">${eur(r.start_eur)}</b></div>
+        <div><span class="lbl">Garanție (10%)</span><b class="num">${eur(r.guar_eur)}</b></div>
+        ${r.vs_mkt != null ? `<div><span class="lbl">Față de piață</span><b class="num" style="color:${vsColor(r.vs_mkt)}">${r.vs_mkt}%</b></div>` : ''}
+      </div>
+
+      <div class="box addr">
+        <span class="lbl">Adresa</span>
+        <div class="addrline"><b id="addr-text">${esc(r.maps_addr || r.addr || '—')}</b>
+          <button class="copy" type="button" data-copy="${esc(r.maps_addr || '')}" title="Copiază adresa" aria-label="Copiază adresa"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span>Copiază</span></button>
+        </div>
+        ${L.street_alt ? `<span class="muted small">Fostă ${esc(L.type || 'Strada')} ${esc(L.street_alt)}</span>` : ''}
+        ${parts.length ? `<div class="apt">${parts.map(([k, v]) => `<div><span>${k}</span><b>${esc(v)}</b></div>`).join('')}</div>` : ''}
+        ${!L.street ? `<span class="muted small">Publicația nu menționează strada; harta arată localitatea.</span>` : !L.nr && !L.bl ? `<span class="muted small">Publicația nu menționează numărul; harta arată strada.</span>` : ''}
+        <div class="btns">
+          <a class="btn sv" href="${gm}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>Google Maps</a>
+          ${sv ? `<a class="btn" href="${sv}" target="_blank" rel="noopener">Street View</a>` : ''}
+          ${osm ? `<a class="btn" href="${osm}" target="_blank" rel="noopener">Hartă cu blocuri</a>` : ''}
+        </div>
+      </div>
+
       <div class="figs">
-        <div class="fig"><span>Preț de pornire</span><b>${eur(r.start_eur)}</b></div>
-        <div class="fig"><span>Garanție de participare</span><b>${eur(r.guar_eur)}</b></div>
-        <div class="fig"><span>Evaluare</span><b>${eur(r.eval_eur)}</b></div>
         <div class="fig"><span>Valoare de piață</span><b>${eur(r.mkt_value)}</b></div>
-        <div class="fig"><span>€/mp zonă${r.mkt_src === 'estimare' ? ' (estimare)' : ''}</span><b>${r.mkt_ppm ? nf.format(r.mkt_ppm) : '—'}</b></div>
+        <div class="fig"><span>€/mp: tu vs zonă</span><b>${r.eur_m2 && r.mkt_ppm ? nf.format(r.eur_m2) + ' / ' + nf.format(r.mkt_ppm) : '—'}</b></div>
         <div class="fig"><span>Profit estimat</span><b style="color:${r.profit > 10000 ? 'var(--good)' : r.profit < 0 ? 'var(--bad)' : 'inherit'}">${eur(r.profit)}</b></div>
+        <div class="fig"><span>Evaluare</span><b>${eur(r.eval_eur)}</b></div>
       </div>
-      ${r.note ? `<div class="note"><b>Verificat manual:</b> ${esc(r.note.replace(/^Verificat manual:\s*/, ''))}</div>` : ''}
-      <dl class="kv">
-        <dt>Licitația</dt><dd>${fmtDate(r.date)}, ora ${esc(r.date.slice(11))}</dd>
-        <dt>Termen</dt><dd>${termChip(r.term)}</dd>
-        ${r.cur === 'RON' ? `<dt>Preț în lei</dt><dd class="num">${lei(r.start)}</dd>` : ''}
-        <dt>Garanție</dt><dd><span class="num">${eur(r.guar_eur)}${r.cur === 'RON' && r.guar ? ` (${lei(r.guar)})` : ''}</span><br><span class="muted" style="font-size:12.5px">De regulă 10% din prețul de pornire. Se plătește în contul executorului, iar dovada se atașează ofertei de cumpărare, de obicei până în ziua dinaintea licitației (ofertele la prețul de pornire pot fi depuse și în ziua licitației). Se restituie dacă nu câștigi. Contul și termenul exact sunt în publicația PDF.</span></dd>
-        ${r.eur_m2 ? `<dt>Preț / mp</dt><dd class="num">${nf.format(r.eur_m2)} €/mp aici · ${r.mkt_ppm ? nf.format(r.mkt_ppm) + ' €/mp în piață' : '—'}</dd>` : ''}
-        <dt>Metrou</dt><dd>${r.metro ? `${esc(r.metro.name)} · ${nf.format(r.metro.m)} m (circa ${r.metro.walk_min} min pe jos)` : '—'}</dd>
-        <dt>Adresă</dt><dd>${r.addr_pub ? `<b>${esc(r.addr_pub)}</b><br><span class="muted" style="font-size:12.5px">Adresa exactă, din publicația executorului.</span><br>` : esc(r.addr || '—') + '<br>'}<span class="muted" style="font-size:12.5px">Poziție pe hartă: ${esc(PQ[r.gps_q] || r.gps_q)}${precise ? '' : '. Butonul galben caută adresa exactă din publicație în Google Maps; de acolo, Street View e la un click.'}</span></dd>
-        <dt>Riscuri</dt><dd><div class="risks" style="max-width:none">${riskChips(r.flags) || '<span class="muted">niciunul detectat automat</span>'}</div></dd>
-        ${r.desc ? `<dt>Descriere</dt><dd>${esc(r.desc)}</dd>` : ''}
-      </dl>
-      ${comps}
-      ${historyBox(r)}
-      <p class="src">Sursa: publicația executorului judecătoresc pe REPES (prod.executori.ro). Comparabile: storia.ro, prețuri cerute.</p>
+
+      ${z ? `<div class="box">
+        <span class="lbl">Zona${z.district ? ' ' + esc(z.district) : ''} · median ${nf.format(z.median_ppm)} €/mp (${z.n} anunțuri active)</span>
+        ${z.items.map(i => `<a class="comp" href="${i.url}" target="_blank" rel="noopener"><span class="t">${esc(i.title)}</span><span class="cmeta num">${eur(i.price)} · ${String(i.area).replace('.', ',')} mp · <b>${nf.format(Math.round(i.price / i.area))} €/mp</b>${i.dist != null ? ' · la ' + dist(i.dist) : ''} · ${ago(i.age)}</span></a>`).join('')}
+        <div class="links"><a href="${z.search_url}" target="_blank" rel="noopener">Toate anunțurile din zonă</a><a href="${z.olx_url}" target="_blank" rel="noopener">Caută pe OLX</a></div>
+      </div>` : ''}
+
+      ${risks || r.note ? `<div class="box warnbox"><span class="lbl">Atenție</span>${risks ? `<div class="risks" style="max-width:none">${risks}</div>` : ''}${r.note ? `<p class="small">${esc(r.note.replace(/^Verificat manual:\s*/, ''))}</p>` : ''}</div>` : ''}
+
+      <div class="btns">
+        <a class="btn primary" href="${r.pdf}" target="_blank" rel="noopener">Publicația (PDF)</a>
+        <a class="btn" href="${r.link}" target="_blank" rel="noopener">Anunț REPES</a>
+      </div>
+      ${(r.events || []).length > 1 ? `<details class="hist"><summary>Istoric (${r.events.length})</summary>${historyBox(r)}</details>` : ''}
     </div>`;
   p.hidden = false; document.getElementById('scrim').hidden = false;
   p.scrollTop = 0;
   history.replaceState(null, '', '#' + r.id);
   p.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', closePanel));
+  p.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', () => {
+    const t = b.dataset.copy; const lab = b.querySelector('span');
+    const done = () => { lab.textContent = 'Copiat ✓'; setTimeout(() => lab.textContent = 'Copiază', 1800); };
+    (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(done).catch(() => {
+      const range = document.createRange(); range.selectNodeContents(document.getElementById('addr-text'));
+      const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range); try { document.execCommand('copy'); done(); } catch (e) {}
+    });
+  }));
   p.querySelector('[data-close]').focus();
-  if (r.lat) map.setView([r.lat, r.lng], Math.max(map.getZoom(), 14));
+  if (r.lat && ['adresa', 'strada'].includes(r.gps_q)) map.setView([r.lat, r.lng], Math.max(map.getZoom(), 15));
 }
+
 function historyBox(r) {
   const ev = r.events || [];
   if (!ev.length) return '';
   const T = { nou: 'A apărut pe REPES', pret: 'Preț de pornire schimbat', termen: 'Termen schimbat', data: 'Data licitației mutată', revenit: 'A reapărut pe REPES', iesit: 'A ieșit de pe REPES' };
   const val = e => e.t === 'pret' ? `${eur(e.from)} → <b>${eur(e.to)}</b>` : e.t === 'termen' ? `${esc(e.from)} → <b>${esc(e.to)}</b>` : e.t === 'data' ? `${fmtDate(e.from)} → <b>${fmtDate(e.to)}</b>` : e.t === 'nou' && e.v ? `la ${eur(e.v)}` : '';
-  return `<div class="box"><h3>Istoric</h3>
+  return `<div style="padding-top:10px">
     <ol class="timeline">${ev.slice().reverse().map(e => `<li><span class="when num">${fmtDate(e.d)}</span><span>${T[e.t] || esc(e.t)} ${val(e)}</span></li>`).join('')}</ol>
     <p class="src">Urmărim REPES zilnic din ${fmtDate(TRACKED)}.</p></div>`;
 }

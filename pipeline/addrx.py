@@ -2,7 +2,7 @@
 import re
 ABBR = {'str', 'nr', 'bl', 'sc', 'et', 'ap', 'mun', 'jud', 'loc', 'com', 'sat', 'bd', 'b-dul', 'bdul', 'sos', 'şos', 'șos', 'cam',
         'int', 'intr', 'al', 'sect', 'or', 'oras', 'prel', 'cart', 'tarla', 'parc', 'sp', 'nr.cad', 'cf', 'p-ta', 'pta', 'spl', 'cal', 'dr'}
-ANCH = re.compile(r'(?:s\w?ituat[aăe]?\s*(?:[îiIl1T]n|irr?|ip|la)\s*:?|cu\s+adresa\s*(?:[îi]n|la)?\s*:?|adresa\s*(?:imobilului)?\s*(?::|(?=(?:str|strada|bd|b-dul|calea|aleea|[sș]os|drumul|mun|ora[sș]ul|comuna|sat)\b))|imobil(?:ul)?\s+(?:din|de\s+la)\s)', re.I)
+ANCH = re.compile(r'(?:s\w?ituat[aăe]?\s*(?:[îiIl1T]n|irr?|ip|la)\s*:?|cu\s+adres[aă]\s*(?:[îi]n|la)?\s*:?|adres[aă]\s*(?:imobilului)?\s*(?::|(?=(?:str|strada|bd|b-dul|bulevardul|calea|aleea|[sș]os|[sș]oseaua|drumul|intrarea|splaiul|mun|municipiul|ora[sș]ul|comuna|sat)\b))|imobil(?:ul)?\s+(?:din|de\s+la)\s)', re.I)
 STOP = re.compile(r'(?:,?\s*(?:jud(?:e[tţț]ul)?\.?|jude[tţț]ul)\s+[A-ZĂÂÎȘŞȚŢ]|,?\s*[îi]nscris|,?\s*identificat|,?\s*av[aâ]nd\s+(?:nr|num|cf|suprafa)|,?\s*compus|,?\s*cu\s+suprafa|,?\s*[îi]n\s+suprafa|,?\s*CF\s*(?:nr)?|,?\s*carte(?:a)?\s+funciar|,?\s*proprietatea|,?\s*apar[tţț]in|,?\s*evaluat|,?\s*la\s+pre[tţț]ul|,?\s*nr\.?\s*cadastral|\(\s*cod\s+interfon|,?\s*cod\s+po[sș]tal|\(prin|,?\s*a[sș]a\s+cum|,?\s*edificat|;\s*proprietar|;\s*sarcin|,?\s*UAT\b|;\s*nr\.?\s*cadastral|,?\s*Rom\S{0,3}nia\b|,?\s*cu\s+o\s+suprafa)', re.I)
 GOOD = re.compile(r'(?i)\b(str|strada|bd|b-dul|bulevardul|calea|aleea|al|sos|șos|şos|soseaua|intrarea|piata|p-ta|splaiul|drumul)\b')
 BAD_CTX = re.compile(r'(?i)(domicili|cu\s+sediul|sediul|biroul|cabinet|executor|cu\s+re[sș]edin|coresponden|creditor|locul\s+licita|licita[tţț]i[ae]\s+(?:se\s+)?(?:va|are)|s\.?r\.?l|s\.a\.|ifn|cif\b)')
@@ -34,7 +34,7 @@ def extract(text):
         st = STOP.search(seg)
         if st: seg = seg[:st.start()]
         seg = clean(_cut_sentence(seg))
-        if len(seg) < 8 or not GOOD.search(seg): continue
+        if len(seg) < 8 or not (GOOD.search(seg) or re.search(r'(?i)\b(bl|blocul)\b\.?\s*\w', seg)): continue
         if BAD_CTX.search(seg): continue
         score = len(re.findall(r'(?i)\b(nr|num[aă]rul|bl|blocul|sc|scara|et|etajul|ap|apartamentul|str|strada)\b', seg))
         if best is None or score > best[0]: best = (score, seg[:220])

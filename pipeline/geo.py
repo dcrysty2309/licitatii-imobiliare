@@ -36,6 +36,7 @@ for r in rows:
     e = api.get(r['id'][:8])
     g = e['asset']['address'].get('gpsLocation') if e else ''
     p = PREC.get(r['id'][:8])
+    if p and 'lat' not in p: p = None
     r['geo_label'] = p['label'] if p else None
     if p and p['q'] in ('bloc', 'numar'):
         r['lat'], r['lng'] = p['lat'], p['lng']
