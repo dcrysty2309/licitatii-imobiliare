@@ -598,9 +598,10 @@ function openPanel(r) {
       <div class="box addr">
         <span class="lbl">Adresa</span>
         <div class="addrline"><b id="addr-text">${esc(r.maps_addr || r.addr || '—')}</b>
-          <button class="copy" type="button" data-copy="${esc(r.maps_addr || '')}" title="Copiază adresa" aria-label="Copiază adresa"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span>Copiază</span></button>
+          <button class="copy" type="button" data-copy="${esc((r.maps_q || r.maps_addr || '').replace(/, România$/, ''))}" title="Copiază adresa în forma pe care o găsește Google Maps" aria-label="Copiază adresa"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span>Copiază</span></button>
         </div>
-        ${L.street_alt ? `<span class="muted small">Fostă ${esc(L.type || 'Strada')} ${esc(L.street_alt)}</span>` : ''}
+        ${L.street_alt ? (() => { const gq = (r.maps_q || '').replace(/, România$/, ''); const viaOld = gq && gq !== r.maps_addr;
+          return `<span class="muted small">Fostă ${esc(L.type || 'Strada')} ${esc(L.street_alt)}.${viaOld ? ` În Google Maps strada apare încă cu numele vechi, așa că butonul caută <b style="color:var(--fg)">${esc(gq)}</b> (aceeași clădire).` : ''}</span>`; })() : ''}
         ${parts.length ? `<div class="apt">${parts.map(([k, v]) => `<div><span>${k}</span><b>${esc(v)}</b></div>`).join('')}</div>` : ''}
         ${!L.street ? `<span class="muted small">Publicația nu menționează strada; harta arată localitatea.</span>` : !L.nr && !L.bl ? `<span class="muted small">Publicația nu menționează numărul; harta arată strada.</span>` : ''}
         <div class="btns">
