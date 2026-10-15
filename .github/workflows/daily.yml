@@ -59,5 +59,7 @@ jobs:
             echo "Nicio schimbare azi."
           else
             git commit -m "Actualizare $(TZ=Europe/Bucharest date +%Y-%m-%d)"
+            # daca repo-ul s-a schimbat intre timp (ex. modificari de cod), datele de azi au prioritate
+            git pull --rebase -X theirs origin main
             git push
           fi

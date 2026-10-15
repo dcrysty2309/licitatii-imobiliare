@@ -21,12 +21,15 @@ print('BNR EUR', RATE, RATE_DATE)
 api = {e['id']: e for e in json.load(open(BASE + '/apts_all.json'))}
 import unicodedata as _ud
 def _n(x): return _ud.normalize('NFKD', x or '').encode('ascii', 'ignore').decode().lower()
-def maps_query(e):
+def maps_query(e, pub=None):
     a = (e or {}).get('asset', {}).get('address') or {}
-    orig = (a.get('originalAddress') or '').replace('\u237d', ' ')
+    orig = (pub or a.get('originalAddress') or '').replace('\u237d', ' ')
+    orig = _re.sub(r'(?i)\bnum[aă]rul\s*', 'nr. ', orig)
+    orig = _re.sub(r'^[^A-Za-zĂÂÎȘŞȚŢăâîșşțţ]+', '', orig)
+    orig = _re.sub(r"['’`]", '', orig)
     orig = _re.sub(r'\s*\((fost[ae]?|fosta|fost)[^)]*\)', '', orig, flags=_re.I)
     orig = _re.sub(r',?\s*(Romania|România)\s*$', '', orig, flags=_re.I)
-    orig = _re.sub(r'(?i),?\s*\b(bl|sc|et|ap|cam|scara|etaj|apartament)\b\.?\s*[\w-]*', '', orig)
+    orig = _re.sub(r'(?i),?\s*\b(bl|blocul|sc|scara|et|etaj|etajul|ap|apartament|apartamentul|cam|parter)\b\.?\s*[\w-]*', '', orig)
     orig = _re.sub(r'\s{2,}', ' ', orig).strip(' ,-')
     city, county = a.get('city') or '', a.get('county') or ''
     m = _re.match(r'(?i)sectorul\s*(\d)', city)
@@ -70,7 +73,8 @@ for r in rows:
     gv = g.get('value')
     o['guar'] = gv
     o['guar_eur'] = None if gv is None else round(gv if g.get('currency') == 'EUR' else gv / RATE)
-    o['maps_q'] = maps_query(e)
+    o['addr_pub'] = r.get('addr_pub')
+    o['maps_q'] = maps_query(e, r.get('addr_pub'))
     o['pic'] = f"https://prod.executori.ro/repes/api/auctions/{e['caseId']}/{e['id']}/pictures/{pics[0]}/thumbnail" if pics else None
     o.update(id=r['id'][:8],mkt_ppm=ppm, mkt_src=src, mkt_value=mv, profit=profit, vs_mkt=vs,
              metro_m=(r['metro'] or {}).get('m') if r.get('metro') else None)
