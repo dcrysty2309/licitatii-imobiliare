@@ -148,6 +148,11 @@ td.r, th.r { text-align: right; }
 /* telefon: carduri in loc de tabel */
 .list { display: none; gap: 12px; }
 @media (max-width: 760px) {
+  .toolbar { position: static; backdrop-filter: none; background: none; margin: 0 0 4px; padding: 0; }
+  .filters { gap: 8px; }
+  .field { flex: 1 1 calc(50% - 4px); }
+  .field select, .field input, .field input[type=number] { width: 100%; }
+  .field.search { flex-basis: 100%; }
   .tablebox { display: none; }
   .list { display: grid; }
   .count { width: 100%; margin-left: 0; }
