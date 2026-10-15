@@ -351,6 +351,10 @@ td.r .l1, td.r .l2 { text-align: right; }
 
 .prop .l2.pl2 { white-space: nowrap; display: flex; align-items: center; gap: 6px; }
 .ptype.ic { padding: 2px 4px; border-radius: 5px; background: var(--surface-2); border: 1px solid var(--line); }
+
+td.pm { width: 150px; }
+td.pm .l2 { white-space: normal; }
+.risks { max-width: 150px; }
 </style>
 </head>
 <body>
@@ -607,7 +611,7 @@ function render() {
     <td><span class="l1">${fmtDate(r.date)}</span><span class="l2">${termChip(r.term)}</span></td>
     <td class="prop"><span class="l1">${esc(r.city)}<small>${esc(r.county)}</small> ${newChip(r)}${chgChip(r)}</span><span class="l2 pl2">${typeIcon(r, true)}${esc(roomsTxt(r) || '')}</span></td>
     <td class="r"><span class="l1 price1 num">${eur(r.start_eur)}</span><span class="l2 num">garanție ${eur(r.guar_eur)}</span></td>
-    <td class="r">${vsCell(r)}</td>
+    <td class="r pm">${vsCell(r)}</td>
     <td class="r"><span class="dwrap">${underChip(r)}${r.vs_mkt != null ? tip(discTip(r), true) : ''}</span></td>
     <td class="r">${profitHtml(r)}</td>
     <td>${r.metro ? `<span class="l1 num">${r.metro.walk_min} min</span><span class="l2">${esc(r.metro.name)}</span>` : ''}</td>
