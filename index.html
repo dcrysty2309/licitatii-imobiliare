@@ -195,7 +195,8 @@ td.r, th.r { text-align: right; }
 .vs { width: 170px; display: grid; gap: 6px; }
 .vs .top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
 .vs .top b { font-size: 14.5px; }
-.vs .top span { color: var(--muted); font-size: 12px; }
+.vs .top span { color: var(--muted); font-size: 12.5px; }
+.vs .zn { color: var(--muted); font-size: 11.5px; }
 .profit { font-weight: 700; white-space: nowrap; font-size: 14.5px; }
 .risks { display: flex; flex-wrap: wrap; gap: 4px; max-width: 210px; }
 .dash { color: var(--muted); opacity: .45; }
@@ -244,6 +245,20 @@ td.r, th.r { text-align: right; }
 .box h3 { font-size: 16px; }
 .comp { display: grid; gap: 2px; padding-top: 10px; border-top: 1px solid var(--line); }
 .comp a { font-weight: 600; text-decoration: none; }
+.cmeta { color: var(--muted); font-size: 13px; display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; }
+.cmeta b { color: var(--fg); }
+.range { display: grid; gap: 10px; padding: 6px 0 2px; }
+.range .track { position: relative; height: 12px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); }
+.range .track i { position: absolute; top: 50%; transform: translate(-50%, -50%); }
+.range .track .iqr { transform: translateY(-50%); height: 100%; background: color-mix(in srgb, var(--accent) 22%, transparent); border-radius: 999px; }
+.range .track .med { width: 3px; height: 20px; background: var(--accent); border-radius: 2px; }
+.range .track .you { width: 16px; height: 16px; border-radius: 50%; background: var(--good); border: 3px solid var(--surface); box-shadow: 0 1px 4px rgb(0 0 0 / .3); }
+.legend2 { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+.legend2 b { color: var(--fg); }
+.legend2 .k { display: inline-block; width: 12px; height: 12px; margin-right: 7px; vertical-align: -1px; border-radius: 3px; }
+.legend2 .k.you { background: var(--good); border-radius: 50%; }
+.legend2 .k.med { background: var(--accent); width: 4px; }
+.legend2 .k.iqr { background: color-mix(in srgb, var(--accent) 22%, transparent); }
 .comp a:hover { text-decoration: underline; }
 .note { background: var(--accent-soft); border-radius: 12px; padding: 12px 14px; font-size: 13.5px; }
 .src { color: var(--muted); font-size: 12.5px; }
@@ -432,7 +447,7 @@ function init() {
     L.circleMarker([r.lat, r.lng], { radius: 5, color: '#fff', weight: 1.5, fillColor: c, fillOpacity: 1, interactive: false }).addTo(hm);
   });
 
-  const picks = whole.filter(r => r.vs_mkt != null && r.mkt_src === 'storia' && r.profit > 5000 && !/EXCLUS/.test(r.flags)).sort((a, b) => a.vs_mkt - b.vs_mkt).slice(0, 8);
+  const picks = whole.filter(r => r.vs_mkt != null && ['storia', 'zona'].includes(r.mkt_src) && r.profit > 5000 && !/EXCLUS/.test(r.flags)).sort((a, b) => a.vs_mkt - b.vs_mkt).slice(0, 8);
   document.getElementById('picks').innerHTML = picks.map(r => `
     <button class="card" type="button" data-id="${r.id}">
       <div class="mini">${miniMap(r)}<span class="badge">${termChip(r.term)}</span></div>
@@ -440,7 +455,7 @@ function init() {
         <div class="place"><h3>${esc(r.city)}</h3><span>${esc(r.county)}</span></div>
         <div class="spec">${esc(roomsTxt(r) || r.name)}</div>
         <div class="price num">${eur(r.start_eur)}<small>pornire</small></div>
-        <div class="meter"><div class="row"><span>față de piață</span><b class="num" style="color:${vsColor(r.vs_mkt)}">${r.vs_mkt}%</b></div>${vsBar(r.vs_mkt)}</div>
+        <div class="meter"><div class="row"><span>plătești <b class="num">${nf.format(r.eur_m2)} €/mp</b> · zona <b class="num">${nf.format(r.mkt_ppm)} €/mp</b></span><b class="num" style="color:${vsColor(r.vs_mkt)}">${r.vs_mkt}%</b></div>${vsBar(r.vs_mkt)}</div>
         <div class="facts"><span>Garanție <b class="num">${eur(r.guar_eur)}</b></span><span>Profit est. <b class="num">${eur(r.profit)}</b></span><span>${fmtDate(r.date)}</span>${r.metro ? `<span>Metrou ${esc(r.metro.name)} · <b>${r.metro.walk_min} min</b></span>` : ''}</div>
       </div>
     </button>`).join('');
@@ -470,7 +485,7 @@ function init() {
 const byId = id => ROWS.find(x => x.id === id);
 
 const COLS = [
-  ['date', 'Licitația'], ['city', 'Proprietate'], ['start_eur', 'Preț · garanție', 'r'], ['vs_mkt', 'Față de piață'],
+  ['date', 'Licitația'], ['city', 'Proprietate'], ['start_eur', 'Preț · garanție', 'r'], ['vs_mkt', '€/mp: tu vs zonă'],
   ['profit', 'Profit est.', 'r'], ['metro_m', 'Metrou'], ['flags', 'Atenție']
 ];
 let sortKey = 'vs_mkt', sortDir = 1;
@@ -499,7 +514,8 @@ function filtered() {
 
 function vsCell(r) {
   if (r.vs_mkt == null) return `<span class="dash">—</span>`;
-  return `<div class="vs" title="${r.eur_m2} €/mp aici, ${r.mkt_ppm} €/mp în piață${r.mkt_src === 'storia' ? ' (storia.ro)' : ' (estimare)'}"><div class="top"><b class="num" style="color:${vsColor(r.vs_mkt)}">${r.vs_mkt}%</b><span class="num">piață ${nf.format(r.mkt_ppm)} €/mp${r.mkt_src === 'storia' ? '' : '*'}</span></div>${vsBar(r.vs_mkt)}</div>`;
+  const z = r.zone && r.zone.status === 'ok' ? r.zone : null;
+  return `<div class="vs" title="Prețul de pornire înseamnă ${r.eur_m2} €/mp. Zona: ${r.mkt_ppm} €/mp${z ? ' (' + z.n + ' anunțuri, ' + (z.district || z.level) + ')' : r.mkt_src === 'estimare' ? ' (estimare)' : ''}"><div class="top"><span class="num"><b style="color:var(--fg)">${nf.format(r.eur_m2)}</b> vs ${nf.format(r.mkt_ppm)} €/mp${r.mkt_src === 'estimare' ? '*' : ''}</span><b class="num" style="color:${vsColor(r.vs_mkt)}">${r.vs_mkt}%</b></div>${vsBar(r.vs_mkt)}<span class="zn">${z ? esc(z.district ? 'cartier ' + z.district : z.level) : r.mkt_src === 'estimare' ? 'estimare' : 'oraș'}</span></div>`;
 }
 
 function render() {
@@ -525,7 +541,7 @@ function render() {
     <div class="head"><div><h3>${esc(r.city)}</h3><span class="muted" style="font-size:12.5px">${esc(r.county)} · ${fmtDate(r.date)}</span></div>${termChip(r.term)}</div>
     <div class="muted" style="font-size:13px">${esc(roomsTxt(r) || r.name)}</div>
     <div class="price num" style="font-size:22px">${eur(r.start_eur)}<small>garanție ${eur(r.guar_eur)}</small></div>
-    ${r.vs_mkt != null ? `<div class="meter"><div class="row"><span>față de piață</span><b class="num" style="color:${vsColor(r.vs_mkt)}">${r.vs_mkt}%</b></div>${vsBar(r.vs_mkt)}</div>` : ''}
+    ${r.vs_mkt != null ? `<div class="meter"><div class="row"><span>plătești <b class="num">${nf.format(r.eur_m2)} €/mp</b> · zona <b class="num">${nf.format(r.mkt_ppm)} €/mp</b></span><b class="num" style="color:${vsColor(r.vs_mkt)}">${r.vs_mkt}%</b></div>${vsBar(r.vs_mkt)}</div>` : ''}
     <div class="facts">${r.profit != null ? `<span>Profit est. <b class="num">${eur(r.profit)}</b></span>` : ''}${r.metro ? `<span>Metrou ${esc(r.metro.name)} · <b>${r.metro.walk_min} min</b></span>` : ''}</div>
     ${r.flags ? `<div class="risks">${riskChips(r.flags)}</div>` : ''}
   </button>`).join('') || `<div class="empty">Niciun rezultat pentru filtrele alese.</div>`;
@@ -551,7 +567,26 @@ function openPanel(r) {
   const sv = r.lat ? `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${r.lat},${r.lng}` : null;
   const c = r.comps;
   let comps = '';
-  if (c && c.status === 'ok') {
+  const z = r.zone;
+  if (z && z.status === 'ok') {
+    const lo = Math.min(z.p25 * 0.6, r.eur_m2 || z.p25) , hi = Math.max(z.p75 * 1.25, r.eur_m2 || 0);
+    const pos = v => Math.max(0, Math.min(100, (v - lo) / (hi - lo) * 100));
+    const ago = d => d <= 1 ? 'azi' : d < 31 ? `acum ${d} zile` : `acum ${Math.round(d / 30)} luni`;
+    comps = `<div class="box zone">
+      <h3>Analiza zonei${z.district ? ': ' + esc(z.district) : ''}</h3>
+      <p class="muted" style="font-size:13px">${z.n} anunțuri active pe storia.ro ${z.level === 'cartier' ? 'în cartierul ' + esc(z.district) : 'în ' + esc(z.level === 'sector' ? 'sector' : 'oraș')}, cu suprafață apropiată. Blocurile noi și cele în construcție sunt excluse.</p>
+      <div class="range" aria-label="Interval de preț în zonă">
+        <div class="track"><i class="iqr" style="left:${pos(z.p25)}%;width:${pos(z.p75) - pos(z.p25)}%"></i><i class="med" style="left:${pos(z.median_ppm)}%"></i>${r.eur_m2 ? `<i class="you" style="left:${pos(r.eur_m2)}%"></i>` : ''}</div>
+        <div class="legend2"><span><i class="k you"></i>Licitație <b class="num">${r.eur_m2 ? nf.format(r.eur_m2) + ' €/mp' : '—'}</b></span><span><i class="k med"></i>Median zonă <b class="num">${nf.format(z.median_ppm)} €/mp</b></span><span><i class="k iqr"></i>Majoritatea anunțurilor <b class="num">${nf.format(z.p25)}–${nf.format(z.p75)} €/mp</b></span></div>
+      </div>
+      <h3 style="font-size:14.5px;margin-top:4px">${z.items.length} anunțuri comparabile, verificate active</h3>
+      ${z.items.map(i => `<div class="comp"><a href="${i.url}" target="_blank" rel="noopener">${esc(i.title)}</a>
+        <span class="cmeta num">${eur(i.price)} · ${String(i.area).replace('.', ',')} mp · <b>${nf.format(Math.round(i.price / i.area))} €/mp</b></span>
+        <span class="cmeta">${i.dist != null ? `<span class="chip c-t2">la ${i.dist < 1000 ? i.dist + ' m' : (i.dist / 1000).toFixed(1).replace('.', ',') + ' km'}</span> ` : ''}<span class="chip c-ok">activ · actualizat ${ago(i.age)}</span></span></div>`).join('') || '<p class="muted">Niciun anunț activ verificat.</p>'}
+      <div class="btns" style="margin-top:4px"><a class="btn" href="${z.search_url}" target="_blank" rel="noopener">Toate anunțurile din zonă (storia.ro)</a><a class="btn" href="${z.olx_url}" target="_blank" rel="noopener">Caută pe OLX</a></div>
+      <p class="src">Verificat pe ${esc(document.getElementById('updated').dataset.d || '')}: fiecare anunț a fost deschis și avea statusul „activ”, cu ultima actualizare în ultimele 4 luni. Distanța e măsurată în linie dreaptă de la apartamentul scos la licitație.</p>
+    </div>`;
+  } else if (c && c.status === 'ok') {
     comps = `<div class="box"><h3>Anunțuri similare pe storia.ro</h3>
       <p class="muted" style="font-size:13px">${c.n} anunțuri la nivel de ${esc(c.level)}${c.level === 'judet' ? ' (doar orientativ, nu sunt din aceeași localitate)' : ''}. Preț median cerut: <b class="num" style="color:var(--fg)">${nf.format(c.median_ppm)} €/mp</b>.</p>
       ${c.items.map(i => `<div class="comp"><a href="${i.url}" target="_blank" rel="noopener">${esc(i.title)}</a><span class="muted num" style="font-size:13px">${eur(i.price)} · ${i.area} mp · ${nf.format(Math.round(i.price / i.area))} €/mp${i.zone ? ' · ' + esc(i.zone) : ''}</span></div>`).join('')}
@@ -578,7 +613,7 @@ function openPanel(r) {
         <div class="fig"><span>Garanție de participare</span><b>${eur(r.guar_eur)}</b></div>
         <div class="fig"><span>Evaluare</span><b>${eur(r.eval_eur)}</b></div>
         <div class="fig"><span>Valoare de piață</span><b>${eur(r.mkt_value)}</b></div>
-        <div class="fig"><span>€/mp piață${r.mkt_src === 'storia' ? '' : ' (estimare)'}</span><b>${r.mkt_ppm ? nf.format(r.mkt_ppm) : '—'}</b></div>
+        <div class="fig"><span>€/mp zonă${r.mkt_src === 'estimare' ? ' (estimare)' : ''}</span><b>${r.mkt_ppm ? nf.format(r.mkt_ppm) : '—'}</b></div>
         <div class="fig"><span>Profit estimat</span><b style="color:${r.profit > 10000 ? 'var(--good)' : r.profit < 0 ? 'var(--bad)' : 'inherit'}">${eur(r.profit)}</b></div>
       </div>
       ${r.note ? `<div class="note"><b>Verificat manual:</b> ${esc(r.note.replace(/^Verificat manual:\s*/, ''))}</div>` : ''}
