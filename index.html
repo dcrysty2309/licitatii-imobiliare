@@ -321,6 +321,13 @@ a.comp:hover .t { text-decoration: underline; }
 .ftable dd { margin: 0; font-weight: 600; font-size: 15px; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .ftable dd.pos { color: var(--good); }
 .ftable dd.neg { color: var(--bad); }
+
+.tip { position: relative; display: inline-flex; vertical-align: -2px; margin-left: 4px; color: var(--muted); opacity: .7; cursor: help; }
+.tip:hover, .tip.open, .tip:focus-visible { opacity: 1; color: var(--accent); }
+.tipbox { display: none; position: absolute; left: -8px; top: calc(100% + 8px); z-index: 30; width: min(300px, 70vw); background: var(--fg); color: var(--surface); font-size: 12.5px; line-height: 1.45; font-weight: 400; padding: 10px 12px; border-radius: 10px; box-shadow: 0 10px 30px rgb(0 0 0 / .2); text-align: left; white-space: normal; }
+.tipbox::before { content: ""; position: absolute; left: 12px; top: -5px; width: 10px; height: 10px; background: var(--fg); transform: rotate(45deg); }
+@media (hover: hover) { .tip:hover .tipbox { display: block; } }
+.tip.open .tipbox, .tip:focus-visible .tipbox { display: block; }
 </style>
 </head>
 <body>
@@ -593,6 +600,9 @@ function render() {
   });
 }
 
+function tip(text) {
+  return `<span class="tip" tabindex="0" role="button" aria-label="Detalii"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v5.5"/><circle cx="12" cy="7.6" r=".6" fill="currentColor"/></svg><span class="tipbox">${esc(text)}</span></span>`;
+}
 function openPanel(r) {
   if (!r) return;
   const p = document.getElementById('panel');
@@ -639,10 +649,10 @@ function openPanel(r) {
       </div>
 
       <dl class="ftable">
-        <div><dt>Evaluare executor</dt><dd>${eur(r.eval_eur)}</dd></div>
-        <div><dt>Valoare de piață estimată</dt><dd>${eur(r.mkt_value)}</dd></div>
-        <div><dt>Preț pe mp: licitație / zonă</dt><dd>${r.eur_m2 && r.mkt_ppm ? nf.format(r.eur_m2) + ' / ' + nf.format(r.mkt_ppm) + ' €' : '—'}</dd></div>
-        <div><dt>Profit estimat</dt><dd class="${r.profit > 0 ? 'pos' : r.profit < 0 ? 'neg' : ''}">${eur(r.profit)}</dd></div>
+        <div><dt>Evaluare executor ${tip('Valoarea stabilită de evaluatorul autorizat (ANEVAR) din dosarul de executare. Poate fi veche sau diferită de prețul real al pieței.')}</dt><dd>${eur(r.eval_eur)}</dd></div>
+        <div><dt>Valoare de piață estimată ${tip(`Estimare orientativă, nu evaluare: suprafața × prețul median pe mp al anunțurilor active similare ${r.mkt_src === 'estimare' ? '(aici o medie aproximativă pe oraș, lipsind anunțuri similare)' : 'din zonă (storia.ro)'}, minus 7% pentru negocierea obișnuită. Nu ține cont de starea apartamentului, etaj sau bloc.`)}</dt><dd>${eur(r.mkt_value)}</dd></div>
+        <div><dt>Preț pe mp: licitație / zonă ${tip('Prețul de pornire împărțit la suprafața utilă, comparat cu mediana prețului pe mp cerut în anunțurile din zonă.')}</dt><dd>${r.eur_m2 && r.mkt_ppm ? nf.format(r.eur_m2) + ' / ' + nf.format(r.mkt_ppm) + ' €' : '—'}</dd></div>
+        <div><dt>Profit estimat ${tip('Valoarea de piață estimată − prețul de pornire − renovare (220 €/mp, minim 4.000 €) − 2% costuri la cumpărare − 5% costuri la vânzare. NU include impozitul, dobânda creditului, eventuale datorii la întreținere sau costul evacuării. Prețul final la licitație poate fi mai mare decât prețul de pornire.')}</dt><dd class="${r.profit > 0 ? 'pos' : r.profit < 0 ? 'neg' : ''}">${eur(r.profit)}</dd></div>
       </dl>
 
       ${z ? `<div class="box">
@@ -672,6 +682,11 @@ function openPanel(r) {
     });
   }));
   p.focus();
+  p.querySelectorAll('.tip').forEach(t => {
+    const tog = e => { e.stopPropagation(); const on = !t.classList.contains('open'); p.querySelectorAll('.tip.open').forEach(x => x.classList.remove('open')); t.classList.toggle('open', on); };
+    t.addEventListener('click', tog); t.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tog(e); } });
+  });
+  p.addEventListener('click', () => p.querySelectorAll('.tip.open').forEach(x => x.classList.remove('open')));
   if (r.lat && ['adresa', 'strada'].includes(r.gps_q)) map.setView([r.lat, r.lng], Math.max(map.getZoom(), 15));
 }
 
