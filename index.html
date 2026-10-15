@@ -340,6 +340,14 @@ a.comp:hover .t { text-decoration: underline; }
 main > section, main > div { min-width: 0; }
 .tablebox { max-width: 100%; }
 .prop .l2 { white-space: normal; }
+
+.ptype { display: inline-flex; align-items: center; gap: 4px; color: var(--muted); }
+.dwrap { display: inline-flex; align-items: center; gap: 2px; }
+.tip-r .tipbox { left: auto; right: -8px; }
+.tip-r .tipbox::before { left: auto; right: 12px; }
+th.r { text-align: right; }
+td.r .l1, td.r .l2 { text-align: right; }
+.lbl .tip { vertical-align: -3px; }
 </style>
 </head>
 <body>
@@ -541,7 +549,7 @@ function init() {
 const byId = id => ROWS.find(x => x.id === id);
 
 const COLS = [
-  ['date', 'Licitația'], ['city', 'Proprietate'], ['start_eur', 'Preț · garanție', 'r'], ['eur_m2', 'Preț / mp'], ['vs_mkt', 'Sub piață', 'r'],
+  ['date', 'Licitația'], ['city', 'Proprietate'], ['start_eur', 'Preț · garanție', 'r'], ['eur_m2', 'Preț / mp', 'r'], ['vs_mkt', 'Sub piață', 'r'],
   ['profit', 'Profit est.', 'r'], ['metro_m', 'Metrou'], ['flags', 'Atenție']
 ];
 let sortKey = 'vs_mkt', sortDir = 1;
@@ -567,10 +575,19 @@ function filtered() {
 const under = r => r.vs_mkt == null ? null : 100 - r.vs_mkt;
 const underTxt = r => { const u = under(r); return u == null ? '—' : u >= 0 ? `−${u}%` : `+${-u}%`; };
 const underChip = r => r.vs_mkt == null ? '<span class="dash">—</span>' : `<span class="disc" style="color:${vsColor(r.vs_mkt)};background:color-mix(in srgb, ${vsColor(r.vs_mkt)} 12%, transparent)">${underTxt(r)}</span>`;
+const ICON_APT = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="M9 7h.01M15 7h.01M9 11h.01M15 11h.01M9 15h.01M15 15h.01M10.5 21v-3h3v3"/></svg>';
+const ICON_HOUSE = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg>';
+const typeIcon = r => r.kind === 'casa' ? `<span class="ptype">${ICON_HOUSE}Casă</span>` : r.kind === 'apartament' ? `<span class="ptype">${ICON_APT}Apartament</span>` : '';
+function discTip(r) {
+  if (r.vs_mkt == null) return '';
+  const z = r.zone && r.zone.status === 'ok' ? r.zone : null;
+  const src = z ? (z.scope === 'raza' ? `mediana a ${z.n_near} anunțuri active de pe storia.ro aflate la max 1,5 km` : `mediana a ${z.n} anunțuri active din ${z.district ? 'cartierul ' + z.district : 'oraș'} (prea puține la 1,5 km)`) : 'o medie aproximativă pe oraș (nu am găsit anunțuri similare)';
+  return `Prețul de pornire înseamnă ${nf.format(r.eur_m2)} €/mp. În zonă se cer în medie ${nf.format(r.mkt_ppm)} €/mp (${src}, minus 7% pentru negociere). ${underTxt(r)} arată cu cât e prețul de pornire sub această valoare. Orientativ: nu ține cont de starea apartamentului, etaj sau de faptul că licitația poate urca peste prețul de pornire.`;
+}
 function zoneLabel(r) { const z = r.zone && r.zone.status === 'ok' ? r.zone : null; return z ? (z.scope === 'raza' ? 'pe 1,5 km' : z.district ? z.district : 'oraș') : r.mkt_src === 'estimare' ? 'estimare' : 'oraș'; }
 function vsCell(r) {
   if (!r.eur_m2) return `<span class="dash">—</span>`;
-  return `<span class="l1 num">${nf.format(r.eur_m2)} €/mp</span>${r.mkt_ppm ? `<span class="l2 num">zona ${nf.format(r.mkt_ppm)} €/mp</span><span class="l2">${esc(zoneLabel(r))}</span>` : ''}`;
+  return `<span class="l1 num">${nf.format(r.eur_m2)} €/mp</span>${r.mkt_ppm ? `<span class="l2 num">zona ${nf.format(r.mkt_ppm)} € · ${esc(zoneLabel(r))}</span>` : ''}`;
 }
 
 function render() {
@@ -585,10 +602,10 @@ function render() {
   const profitHtml = r => r.profit == null ? '<span class="dash">—</span>' : `<span class="profit num" style="color:${r.profit > 10000 ? 'var(--good)' : r.profit < 0 ? 'var(--bad)' : 'var(--fg)'}">${eur(r.profit)}</span>`;
   document.getElementById('tbody').innerHTML = rows.map(r => `<tr data-id="${r.id}" tabindex="0">
     <td><span class="l1">${fmtDate(r.date)}</span><span class="l2">${termChip(r.term)}</span></td>
-    <td class="prop"><span class="l1">${esc(r.city)}<small>${esc(r.county)}</small> ${newChip(r)}${chgChip(r)}</span><span class="l2">${esc(roomsTxt(r) || r.name)}</span></td>
+    <td class="prop"><span class="l1">${esc(r.city)}<small>${esc(r.county)}</small> ${newChip(r)}${chgChip(r)}</span><span class="l2">${typeIcon(r)}${roomsTxt(r) ? ' · ' + esc(roomsTxt(r)) : ''}</span></td>
     <td class="r"><span class="l1 price1 num">${eur(r.start_eur)}</span><span class="l2 num">garanție ${eur(r.guar_eur)}</span></td>
-    <td>${vsCell(r)}</td>
-    <td class="r">${underChip(r)}</td>
+    <td class="r">${vsCell(r)}</td>
+    <td class="r"><span class="dwrap">${underChip(r)}${r.vs_mkt != null ? tip(discTip(r), true) : ''}</span></td>
     <td class="r">${profitHtml(r)}</td>
     <td>${r.metro ? `<span class="l1 num">${r.metro.walk_min} min</span><span class="l2">${esc(r.metro.name)}</span>` : ''}</td>
     <td><div class="risks">${riskChips(r.flags)}</div></td>
@@ -601,6 +618,7 @@ function render() {
     <div class="facts">${r.profit != null ? `<span>Profit est. <b class="num">${eur(r.profit)}</b></span>` : ''}${r.metro ? `<span>Metrou ${esc(r.metro.name)} · <b>${r.metro.walk_min} min</b></span>` : ''}</div>
     ${r.flags ? `<div class="risks">${riskChips(r.flags)}</div>` : ''}
   </button>`).join('') || `<div class="empty">Niciun rezultat pentru filtrele alese.</div>`;
+  document.querySelectorAll('#tbody .tip').forEach(t => t.addEventListener('click', e => { e.stopPropagation(); const on = !t.classList.contains('open'); document.querySelectorAll('.tip.open').forEach(x => x.classList.remove('open')); t.classList.toggle('open', on); }));
   document.querySelectorAll('#tbody tr[data-id], #list .lcard').forEach(el => {
     const open = () => openPanel(byId(el.dataset.id));
     el.addEventListener('click', open);
@@ -616,8 +634,8 @@ function render() {
   });
 }
 
-function tip(text) {
-  return `<span class="tip" tabindex="0" role="button" aria-label="Detalii"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v5.5"/><circle cx="12" cy="7.6" r=".6" fill="currentColor"/></svg><span class="tipbox">${esc(text)}</span></span>`;
+function tip(text, right) {
+  return `<span class="tip${right ? ' tip-r' : ''}" tabindex="0" role="button" aria-label="Detalii"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v5.5"/><circle cx="12" cy="7.6" r=".6" fill="currentColor"/></svg><span class="tipbox">${esc(text)}</span></span>`;
 }
 function openPanel(r) {
   if (!r) return;
@@ -645,7 +663,7 @@ function openPanel(r) {
       <div class="pricebar">
         <div><span class="lbl">Preț de pornire</span><b class="big num">${eur(r.start_eur)}</b>${r.cur === 'RON' ? `<span class="muted small num">${lei(r.start)}</span>` : ''}</div>
         <div><span class="lbl">Garanție (10%)</span><b class="num">${eur(r.guar_eur)}</b></div>
-        ${r.vs_mkt != null ? `<div><span class="lbl">Sub piață</span><b class="num" style="color:${vsColor(r.vs_mkt)}">${underTxt(r)}</b></div>` : ''}
+        ${r.vs_mkt != null ? `<div><span class="lbl">Sub piață ${tip(discTip(r))}</span><b class="num" style="color:${vsColor(r.vs_mkt)}">${underTxt(r)}</b></div>` : ''}
       </div>
 
       <div class="addr">
