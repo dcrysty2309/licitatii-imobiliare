@@ -356,6 +356,27 @@ td.pm { width: 130px; }
 td.pm .l2 { white-space: nowrap; }
 td.pm .zl { font-size: 11.5px; opacity: .8; margin-top: 0; }
 .risks { max-width: 150px; }
+
+/* antet fisa: aerisit */
+#panel .inner { gap: 22px; padding-top: 26px; }
+.ph { display: grid; gap: 12px; }
+.ph-top { display: flex; justify-content: space-between; align-items: start; gap: 12px; }
+.ph h2 { font-size: 26px; line-height: 1.15; }
+.ph-sub { margin-top: 4px; display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 15px; }
+.ph-sub .ptype { gap: 5px; }
+.ph-sub .sep { opacity: .5; }
+.ph-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.ph-meta .chip { font-size: 12.5px; padding: 3px 10px; }
+.ph-meta .when { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: var(--fg); }
+.ph-meta .when svg { color: var(--muted); }
+.kcards { display: grid; grid-template-columns: 1.35fr 1fr 1fr; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.kc { display: grid; gap: 6px; align-content: start; padding: 14px 16px; min-width: 0; }
+.kc + .kc { border-left: 1px solid var(--line); }
+.kc.main { background: var(--surface-2); }
+.kc b { font-family: var(--f-display); font-size: 21px; font-weight: 700; line-height: 1.1; white-space: nowrap; }
+.kc.main b { font-size: 25px; }
+.kc-sub { font-size: 12.5px; color: var(--muted); white-space: nowrap; }
+@media (max-width: 480px) { .kcards { grid-template-columns: 1fr 1fr; } .kc.main { grid-column: 1 / -1; } .kc.main + .kc { border-left: 0; } .kc:not(.main) { border-top: 1px solid var(--line); } }
 </style>
 </head>
 <body>
@@ -660,18 +681,36 @@ function openPanel(r) {
   const risks = riskChips(r.flags);
   p.innerHTML = `
     <div class="inner">
-      <div class="title">
-        <div>
-          <h2>${esc(r.city)}${roomsTxt(r) ? ' · ' + esc(roomsTxt(r)) : ''} ${newChip(r)}</h2><p class="muted small" style="margin-top:2px">${typeIcon(r)}</p>
-          <p class="muted" style="margin-top:4px">${termChip(r.term)} <span style="margin-left:6px">Licitația: <b style="color:var(--fg)">${fmtDate(r.date)}, ora ${esc(r.date.slice(11))}</b></span></p>
+      <div class="ph">
+        <div class="ph-top">
+          <div>
+            <h2>${esc(r.city)} ${newChip(r)}</h2>
+            <p class="ph-sub">${typeIcon(r)}${roomsTxt(r) ? `<span class="sep">·</span>${esc(roomsTxt(r))}` : ''}</p>
+          </div>
+          <button class="xclose" type="button" data-close aria-label="Închide">×</button>
         </div>
-        <button class="xclose" type="button" data-close aria-label="Închide">×</button>
+        <div class="ph-meta">
+          ${termChip(r.term)}
+          <span class="when"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>${fmtDate(r.date)}, ora ${esc(r.date.slice(11))}</span>
+        </div>
       </div>
 
-      <div class="pricebar">
-        <div><span class="lbl">Preț de pornire</span><b class="big num">${eur(r.start_eur)}</b>${r.cur === 'RON' ? `<span class="muted small num">${lei(r.start)}</span>` : ''}</div>
-        <div><span class="lbl">Garanție (10%)</span><b class="num">${eur(r.guar_eur)}</b></div>
-        ${r.vs_mkt != null ? `<div><span class="lbl">Sub piață ${tip(discTip(r))}</span><b class="num" style="color:${vsColor(r.vs_mkt)}">${underTxt(r)}</b></div>` : ''}
+      <div class="kcards">
+        <div class="kc main">
+          <span class="lbl">Preț de pornire</span>
+          <b class="num">${eur(r.start_eur)}</b>
+          <span class="kc-sub num">${r.cur === 'RON' ? lei(r.start) : '&nbsp;'}</span>
+        </div>
+        <div class="kc">
+          <span class="lbl">Garanție 10%</span>
+          <b class="num">${eur(r.guar_eur)}</b>
+          <span class="kc-sub">se depune înainte</span>
+        </div>
+        ${r.vs_mkt != null ? `<div class="kc">
+          <span class="lbl">Sub piață ${tip(discTip(r), true)}</span>
+          <b class="num" style="color:${vsColor(r.vs_mkt)}">${underTxt(r)}</b>
+          <span class="kc-sub num">zona ${nf.format(r.mkt_ppm)} €/mp</span>
+        </div>` : ''}
       </div>
 
       <div class="addr">
