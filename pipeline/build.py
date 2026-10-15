@@ -76,6 +76,7 @@ for r in rows:
     gv = g.get('value')
     o['guar'] = gv
     o['guar_eur'] = None if gv is None else round(gv if g.get('currency') == 'EUR' else gv / RATE)
+    o['eval_ron'] = round(r['eval']) if r.get('eval') and r['cur'] == 'RON' else None
     o['addr_pub'] = r.get('addr_pub')
     repes_addr = ((e or {}).get('asset', {}).get('address') or {}).get('originalAddress')
     comp = components(r.get('addr_pub'), repes_addr)
