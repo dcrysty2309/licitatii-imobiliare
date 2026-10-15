@@ -386,6 +386,18 @@ td.pm .zl { font-size: 11.5px; opacity: .8; margin-top: 0; }
 .ftable dt, .ftable dd { font-size: 15px; line-height: 1.4; }
 .ftable dt { color: var(--muted); }
 .ftable dd .alt { font-size: 15px; }
+
+.disc.ed { color: var(--good); background: var(--good-soft); }
+.mkt { font-size: 12px; color: var(--muted); }
+.cprice { display: flex; justify-content: space-between; align-items: end; gap: 10px; }
+.cprice .lbl { margin-bottom: 2px; }
+.cprice b { font-family: var(--f-display); font-size: 26px; font-weight: 700; line-height: 1.05; }
+.cfacts { margin: 0; display: grid; gap: 0; border-top: 1px solid var(--line); }
+.cfacts > div { display: flex; justify-content: space-between; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 13.5px; }
+.cfacts > div:last-child { border-bottom: 0; }
+.cfacts dt { color: var(--muted); }
+.cfacts dd { margin: 0; color: var(--fg); font-weight: 500; text-align: right; }
+.cfacts dd .muted { font-weight: 400; }
 </style>
 </head>
 <body>
@@ -564,9 +576,12 @@ function init() {
       <div class="body">
         <div class="place"><h3>${esc(r.city)} ${newChip(r)}</h3><span>${esc(r.county)}</span></div>
         <div class="spec">${esc(roomsTxt(r) || r.name)}</div>
-        <div class="price num">${eur(r.start_eur)}<small>pornire</small></div>
-        <div class="meter"><div class="row"><span><b class="num">${nf.format(r.eur_m2)} €/mp</b> · zona <span class="num">${nf.format(r.mkt_ppm)} €/mp</span></span>${underChip(r)}</div></div>
-        <div class="facts"><span>Garanție <b class="num">${eur(r.guar_eur)}</b></span><span>Profit est. <b class="num">${eur(r.profit)}</b></span><span>${fmtDate(r.date)}</span>${r.metro ? `<span>Metrou ${esc(r.metro.name)} · <b>${r.metro.walk_min} min</b></span>` : ''}</div>
+        <div class="cprice"><div><span class="lbl">Preț de pornire</span><b class="num">${eur(r.start_eur)}</b></div>${evalChip(r)}</div>
+        <dl class="cfacts">
+          <div><dt>Evaluare</dt><dd class="num">${eur(r.eval_eur)}</dd></div>
+          <div><dt>Preț / mp</dt><dd class="num">${nf.format(r.eur_m2)} € <span class="muted">(zona ${nf.format(r.mkt_ppm)} €)</span></dd></div>
+          <div><dt>Licitația</dt><dd>${fmtDate(r.date)}</dd></div>
+        </dl>
       </div>
     </button>`).join('');
   document.querySelectorAll('#picks .card').forEach(c => c.addEventListener('click', () => openPanel(byId(c.dataset.id))));
@@ -587,15 +602,15 @@ function init() {
 const byId = id => ROWS.find(x => x.id === id);
 
 const COLS = [
-  ['date', 'Licitația'], ['city', 'Proprietate'], ['start_eur', 'Preț · garanție', 'r'], ['eur_m2', 'Preț / mp', 'r'], ['vs_mkt', 'Sub piață', 'r'],
+  ['date', 'Licitația'], ['city', 'Proprietate'], ['start_eur', 'Preț · garanție', 'r'], ['eur_m2', 'Preț / mp', 'r'], ['discount', 'Reducere', 'r'],
   ['profit', 'Profit est.', 'r'], ['metro_m', 'Metrou'], ['flags', 'Atenție']
 ];
-let sortKey = 'vs_mkt', sortDir = 1;
+let sortKey = 'discount', sortDir = -1;
 function buildHead() {
   const th = document.getElementById('thead');
   th.innerHTML = COLS.map(([k, l, c]) => `<th data-k="${k}" class="${c || ''}" scope="col" tabindex="0">${l}</th>`).join('');
   th.querySelectorAll('th').forEach(el => {
-    const go = () => { const k = el.dataset.k; sortDir = sortKey === k ? -sortDir : (['profit'].includes(k) ? -1 : 1); sortKey = k; render(); };
+    const go = () => { const k = el.dataset.k; sortDir = sortKey === k ? -sortDir : (['profit', 'discount'].includes(k) ? -1 : 1); sortKey = k; render(); };
     el.addEventListener('click', go);
     el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
   });
@@ -622,6 +637,9 @@ function discTip(r) {
   const src = z ? (z.scope === 'raza' ? `mediana a ${z.n_near} anunțuri active de pe storia.ro aflate la max 1,5 km` : `mediana a ${z.n} anunțuri active din ${z.district ? 'cartierul ' + z.district : 'oraș'} (prea puține la 1,5 km)`) : 'o medie aproximativă pe oraș (nu am găsit anunțuri similare)';
   return `Prețul de pornire înseamnă ${nf.format(r.eur_m2)} €/mp. În zonă se cer în medie ${nf.format(r.mkt_ppm)} €/mp (${src}, minus 7% pentru negociere). ${underTxt(r)} arată cu cât e prețul de pornire sub această valoare. Orientativ: nu ține cont de starea apartamentului, etaj sau de faptul că licitația poate urca peste prețul de pornire.`;
 }
+const evalDisc = r => r.discount != null && r.discount > 0 ? r.discount : null;
+const evalChip = r => evalDisc(r) == null ? '<span class="dash">—</span>' : `<span class="disc ed">−${evalDisc(r)}%</span>`;
+const mktLine = r => r.vs_mkt == null ? '' : `<span class="mkt">piață ${underTxt(r)}</span>`;
 function zoneLabel(r) { const z = r.zone && r.zone.status === 'ok' ? r.zone : null; return z ? (z.scope === 'raza' ? 'pe 1,5 km' : z.district ? z.district : 'oraș') : r.mkt_src === 'estimare' ? 'estimare' : 'oraș'; }
 function vsCell(r) {
   if (!r.eur_m2) return `<span class="dash">—</span>`;
@@ -643,7 +661,7 @@ function render() {
     <td class="prop"><span class="l1">${esc(r.city)}<small>${esc(r.county)}</small> ${newChip(r)}${chgChip(r)}</span><span class="l2 pl2">${typeIcon(r, true)}${esc(roomsTxt(r) || '')}</span></td>
     <td class="r"><span class="l1 price1 num">${eur(r.start_eur)}</span><span class="l2 num">garanție ${eur(r.guar_eur)}</span></td>
     <td class="r pm">${vsCell(r)}</td>
-    <td class="r"><span class="dwrap">${underChip(r)}${r.vs_mkt != null ? tip(discTip(r), true) : ''}</span></td>
+    <td class="r"><span class="l1">${evalChip(r)}</span><span class="l2 dwrap" style="justify-content:flex-end">${mktLine(r)}${r.vs_mkt != null ? tip(discTip(r), true) : ''}</span></td>
     <td class="r">${profitHtml(r)}</td>
     <td>${r.metro ? `<span class="l1 num">${r.metro.walk_min} min</span><span class="l2">${esc(r.metro.name)}</span>` : ''}</td>
     <td><div class="risks">${riskChips(r.flags)}</div></td>
@@ -651,8 +669,11 @@ function render() {
   document.getElementById('list').innerHTML = rows.map(r => `<button class="lcard" type="button" data-id="${r.id}">
     <div class="head"><div><h3>${esc(r.city)} ${newChip(r)}${chgChip(r)}</h3><span class="muted" style="font-size:12.5px">${esc(r.county)} · ${fmtDate(r.date)}</span></div>${termChip(r.term)}</div>
     <div class="muted" style="font-size:13px">${esc(roomsTxt(r) || r.name)}</div>
-    <div class="price num" style="font-size:22px">${eur(r.start_eur)}<small>garanție ${eur(r.guar_eur)}</small></div>
-    ${r.vs_mkt != null ? `<div class="meter"><div class="row"><span><b class="num">${nf.format(r.eur_m2)} €/mp</b> · zona <span class="num">${nf.format(r.mkt_ppm)} €/mp</span></span>${underChip(r)}</div></div>` : ''}
+    <div class="cprice"><div><span class="lbl">Preț de pornire</span><b class="num">${eur(r.start_eur)}</b></div>${evalChip(r)}</div>
+    <dl class="cfacts">
+      <div><dt>Evaluare</dt><dd class="num">${eur(r.eval_eur)}</dd></div>
+      ${r.eur_m2 ? `<div><dt>Preț / mp</dt><dd class="num">${nf.format(r.eur_m2)} €${r.mkt_ppm ? ` <span class="muted">(zona ${nf.format(r.mkt_ppm)} €)</span>` : ''}</dd></div>` : ''}
+    </dl>
     <div class="facts">${r.profit != null ? `<span>Profit est. <b class="num">${eur(r.profit)}</b></span>` : ''}${r.metro ? `<span>Metrou ${esc(r.metro.name)} · <b>${r.metro.walk_min} min</b></span>` : ''}</div>
     ${r.flags ? `<div class="risks">${riskChips(r.flags)}</div>` : ''}
   </button>`).join('') || `<div class="empty">Niciun rezultat pentru filtrele alese.</div>`;
@@ -715,11 +736,11 @@ function openPanel(r) {
           <b class="num">${eur(r.guar_eur)}</b>
           <span class="kc-sub">se depune înainte</span>
         </div>
-        ${r.vs_mkt != null ? `<div class="kc">
-          <span class="lbl">Sub piață ${tip(discTip(r), true)}</span>
-          <b class="num" style="color:${vsColor(r.vs_mkt)}">${underTxt(r)}</b>
-          <span class="kc-sub num">zona ${nf.format(r.mkt_ppm)} €/mp</span>
-        </div>` : ''}
+        <div class="kc">
+          <span class="lbl">Față de evaluare</span>
+          <b class="num" style="color:var(--good)">${evalDisc(r) != null ? '−' + evalDisc(r) + '%' : '—'}</b>
+          <span class="kc-sub num">evaluat ${eur(r.eval_eur)}</span>
+        </div>
       </div>
 
       <div class="addr">
@@ -742,6 +763,7 @@ function openPanel(r) {
         <div><dt>Evaluare executor ${tip('Valoarea stabilită de evaluatorul autorizat din dosarul de executare. Poate fi veche (verifică anul dosarului în publicație) sau diferită de prețul real al pieței. Sumele sunt în lei în publicație; euro e calculat cu cursul BNR de azi, nu cu echivalentul în euro scris uneori în publicație.')}</dt><dd>${eur(r.eval_eur)}${r.eval_ron ? `<span class="alt">(${lei(r.eval_ron)})</span>` : ''}</dd></div>
         <div><dt>Valoare de piață estimată ${tip(`Estimare orientativă, nu evaluare: suprafața × prețul median pe mp al anunțurilor active similare ${r.mkt_src === 'estimare' ? '(aici o medie aproximativă pe oraș, lipsind anunțuri similare)' : 'din zonă (storia.ro)'}, minus 7% pentru negocierea obișnuită. Nu ține cont de starea apartamentului, etaj sau bloc.`)}</dt><dd>${eur(r.mkt_value)}</dd></div>
         <div><dt>Preț pe mp: licitație / zonă ${tip('Prețul de pornire împărțit la suprafața utilă, comparat cu mediana prețului pe mp cerut în anunțurile din zonă.')}</dt><dd>${r.eur_m2 && r.mkt_ppm ? nf.format(r.eur_m2) + ' / ' + nf.format(r.mkt_ppm) + ' €' : '—'}</dd></div>
+        ${r.vs_mkt != null ? `<div><dt>Față de piață (estimat) ${tip(discTip(r))}</dt><dd>${underTxt(r)}</dd></div>` : ''}
         <div><dt>Profit estimat ${tip('Valoarea de piață estimată − prețul de pornire − renovare (220 €/mp, minim 4.000 €) − 2% costuri la cumpărare − 5% costuri la vânzare. NU include impozitul, dobânda creditului, eventuale datorii la întreținere sau costul evacuării. Prețul final la licitație poate fi mai mare decât prețul de pornire.')}</dt><dd class="${r.profit > 0 ? 'pos' : r.profit < 0 ? 'neg' : ''}">${eur(r.profit)}</dd></div>
       </dl>
 
