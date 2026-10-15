@@ -23,26 +23,97 @@ def amounts(text):
         v = to_float(m.group(1))
         if v and 3000 <= v <= 50_000_000: out.append((v, m.start()))
     return out
+WORDS = r'(?:reprez\w*|adica|adică|respectiv|ce\s+reprezint\w*|care\s+reprezint\w*)'
+def _fmt_variants(v):
+    out = set()
+    for i in {int(v), int(round(v))}:
+        s = f"{i:,}".replace(',', '.'); out |= {s, s.replace('.', ' '), str(i), s.replace('.', ',')}
+    return out
+def _positions(start, text):
+    pos = []
+    for f in _fmt_variants(start):
+        for m in re.finditer(re.escape(f) + r'(?![\d])', text): pos.append(m.start())
+    return sorted(set(pos))
+def _amounts_near(text, a, b):
+    seg = text[a:b]; out = []
+    for m in re.finditer(r'(?<![\d.,])(\d{1,3}(?:[.\s]\d{3})+(?:,\d{1,2})?|\d{4,9}(?:[.,]\d{1,2})?)(?!\d)', seg):
+        t = m.group(1).replace(' ', '')
+        if re.fullmatch(r'\d{1,3}(?:\.\d{3})+(?:,\d{1,2})?', t): t = t.replace('.', '').replace(',', '.')
+        else: t = t.replace(',', '.')
+        try: out.append((float(t), a + m.start()))
+        except: pass
+    return out
+LBL = {100: 'I (100%)', 75: 'II (75%)', 50: 'III (50%)'}
+def _label(pct):
+    for k in (100, 75, 50):
+        if abs(pct - k) <= 2: return LBL[k]
+    return f'{round(pct)}%'
 def classify(start, text):
-    am = amounts(text)
-    best = None
-    for ratio, label in ((0.5, 'III (50%)'), (0.75, 'II (75%)'), (1.0, 'I (100%)')):
-        target = start / ratio
-        for v, pos in am:
-            if abs(v - target) / target < 0.006:
-                if ratio == 1.0:
-                    best = best or (v, label)
-                else:
-                    return v, label
-    # explicit statement right after the start price, e.g. "reprezentand 75% din pretul de evaluare"
-    m = re.search(r'(reprez\w*|adica|respectiv|redus\s*cu)[\s,]*(100|75|50)\s*[%9]\s*din\s*(pretul|valoarea)\s*(de\s*evaluare|la\s*care|fixat|de\s*pornire\s*a\w*\s*prime\w*)', text)
-    if m:
-        pct = int(m.group(2))
-        label = {100: 'I (100%)', 75: 'II (75%)', 50: 'III (50%)'}[pct]
-        return start / (pct / 100), label
-    if best:
-        return best
-    return None, 'neclar'
+    """-> (evaluare, eticheta, dovada). Bazat pe ce scrie explicit in publicatie."""
+    pos = _positions(start, text)
+    windows = [(max(0, p - 350), p + 450) for p in pos] or []
+    def snippet(m, base=0):
+        a = max(0, base + m.start() - 90); b = base + m.end() + 60
+        return re.sub(r'\s+', ' ', text[a:b]).strip()
+    # 1) procent explicit langa pretul de pornire
+    for a, b in windows:
+        seg = text[a:b]
+        m = re.search(WORDS + r'[\s,:]*(\d{2,3})(?:[.,]0+)?\s*[%9][^%]{0,45}?din\s*(?:pretul|valoarea|pre[tț]ul)\s*(?:de\s*evaluare|la\s*care|fixat|stabilit|de\s*pornire\s*a\w*\s*prime\w*|ini[tț]ial)', seg)
+        if m and 30 <= int(m.group(1)) <= 100:
+            pct = int(m.group(1)); return start / (pct / 100), _label(pct), snippet(m, a)
+        m = re.search(r'(?:redus\w*|sc[aă]zut\w*|diminuat\w*|reducere\w*)\s*(?:cu|de)\s*(25|50)\s*%', seg)
+        if m:
+            pct = 100 - int(m.group(1)); return start / (pct / 100), _label(pct), snippet(m, a)
+        m = re.search(r'(?:pre[tț]\w*\s*)?(?:determinat|stabilit)\s*prin\s*evaluare|reprezint\w*\s*(?:100\s*%|integral)|egal\w*\s*cu\s*pre[tț]ul\s*de\s*evaluare|pre[tț]ul\s*de\s*evaluare\s*(?:al\s*imobilului\s*)?(?:este\s*)?(?:si\s*)?pre[tț]ul\s*de\s*pornire', seg)
+        if m: return start, LBL[100], snippet(m, a)
+    # 2) valoare de evaluare scrisa explicit
+    for m in re.finditer(r'(?:evaluat\w*\s*(?:la\s*(?:suma\s*de\s*)?|in\s*cuantum\s*de\s*)|pre[tț]ul\s*de\s*evaluare\s*(?:este\s*(?:de\s*)?|de\s*|in\s*cuantum\s*de\s*)?|valoarea\s*(?:de\s*evaluare|stabilit[aă]\s*prin\s*raport\w*)\s*(?:este\s*(?:de\s*)?|de\s*)?)', text):
+        for v, p in _amounts_near(text, m.end(), m.end() + 40)[:1]:
+            if v >= start * 0.98 and v <= start * 2.2:
+                pct = 100 * start / v
+                if 45 <= pct <= 101: return v, _label(pct), snippet(m)
+    # 3) termen numit explicit langa pret ("pentru termen III", "a doua licitatie")
+    for a, b in windows:
+        seg = text[a:b]
+        m = re.search(r'(?:pentru\s*)?termen(?:ul)?\s*(?:nr\.?\s*)?(iii|ii|i)\b(?!\s*(?:alin|lit))', seg)
+        if m:
+            pct = {'i': 100, 'ii': 75, 'iii': 50}[m.group(1)]; return start / (pct / 100), _label(pct), snippet(m, a)
+    return None, 'neclar', None
+
+BOILER = re.compile(r'(?:de\s*la\s*pre[tț]ul\s*de|va\s*(?:incepe|începe)|nu\s*mai\s*pu[tț]in\s*de|in\s*cazul\s*in\s*care|daca\s*nu|la\s*acest\s*termen|la\s*urm[aă]torul\s*termen)', re.I)
+def _not_boiler(text, m, start=None):
+    before = text[max(0, m.start() - 80):m.start()]
+    if start and any(f in before for f in _fmt_variants(start)): return True   # fraza contine chiar pretul de pornire
+    return not BOILER.search(before[-45:])
+_classify_window = classify
+def classify(start, text):
+    ev, lab, sn = _classify_window(start, text)
+    if lab != 'neclar': return ev, lab, sn
+    def snippet(m):
+        return re.sub(r'\s+', ' ', text[max(0, m.start() - 90):m.end() + 60]).strip()
+    # procent explicit oriunde, in afara formulelor standard din lege
+    for m in re.finditer(WORDS + r'[\s,:]*(\d{2,3})(?:[.,]00)?\s*[%9][^%]{0,45}?din\s*(?:pretul|valoarea|pre[tț]ul)\s*(?:de\s*evaluare|la\s*care|fixat|stabilit|de\s*pornire\s*a\w*\s*prime\w*|ini[tț]ial|evaluat)', text):
+        if _not_boiler(text, m, start) and 45 <= int(m.group(1)) <= 100:
+            pct = int(m.group(1)); return start / (pct / 100), _label(pct), snippet(m)
+    for m in re.finditer(r'(?:pre[tț]\w*[^.]{0,80}?)(?:redus\w*|sc[aă]zut\w*|diminuat\w*)\s*cu\s*(25|50)\s*%', text):
+        if _not_boiler(text, m, start):
+            pct = 100 - int(m.group(1)); return start / (pct / 100), _label(pct), snippet(m)
+    for m in re.finditer(r'pentru\s*termen(?:ul)?\s*(iii|ii|i)\b[^.]{0,60}?(?:reprezint|este)', text):
+        pct = {'i': 100, 'ii': 75, 'iii': 50}[m.group(1)]; return start / (pct / 100), _label(pct), snippet(m)
+    m = re.search(r'pre[tț]\w*\s*(?:de\s*pornire|de\s*incepere)[^.]{0,120}?(?:determinat|stabilit)\s*prin\s*(?:evaluare|raport\w*\s*de\s*evaluare|expertiz)', text)
+    if m: return start, LBL[100], snippet(m)
+    m = re.search(r'reprezent\w*\s*pre[tț]ul\s*la\s*care\s*a\s*fost\s*eva', text)
+    if m: return start, LBL[100], snippet(m)
+    m = re.search(r'pentru\s*termen(?:ul)?\s*[|l1]\s*(?:este|reprezint)', text)
+    if m: return start, LBL[100], snippet(m)
+    # valoarea evaluata scrisa altfel: "pretul la care a fost evaluat imobilul este de X", "stabilit la valoarea de X"
+    for m in re.finditer(r'(?:evaluat\w*\s*(?:imobilul\w*\s*)?este\s*de|stabilit\s*la\s*valoarea\s*de|evaluat\w*\s*la\s*valoarea\s*de)', text):
+        for v, p in _amounts_near(text, m.end(), m.end() + 30)[:1]:
+            if start * 0.98 <= v <= start * 2.2:
+                pct = 100 * start / v
+                if 45 <= pct <= 101: return v, _label(pct), snippet(m)
+    return None, 'neclar', None
+
 def sqm(e, text):
     ok = lambda v: v is not None and 14 <= v <= 160
     src = norm((e['asset'].get('description') or '') + ' ' + (e['asset'].get('name') or '')) + ' ' + text
@@ -123,7 +194,7 @@ for e in json.load(open(os.path.join(BASE, 'apts_all.json'))):
     p = e['asset']['price']
     start = p['value'] or 0
     cur = p['currency']
-    ev, term = classify(start, text) if start and text else (None, 'fara text' if not text else 'neclar')
+    ev, term, term_src = classify(start, text) if start and text else (None, 'fara text' if not text else 'neclar', None)
     s_eur = start if cur == 'EUR' else start / EUR
     ev_eur = None if ev is None else (ev if cur == 'EUR' else ev / EUR)
     a = e['asset']['address']
@@ -138,6 +209,7 @@ for e in json.load(open(os.path.join(BASE, 'apts_all.json'))):
         eur_m2=None if not m2 else round(s_eur / m2),
         link=f"https://prod.executori.ro/repes/listing/{e['caseId']}/{e['id']}",
         pdf=f"https://prod.executori.ro/repes/api/auctions/{e['caseId']}/{e['id']}/publication/",
+        term_src=term_src,
         addr_pub=ADDR_MANUAL.get(e['id'][:8]) or (extract_addr(raw) if raw else None),
         kind=kind(e), flags=flags(e, text, s_eur), textlen=len(text)))
 json.dump(rows, open(os.path.join(BASE, 'rows.json'), 'w'), ensure_ascii=False, indent=0)

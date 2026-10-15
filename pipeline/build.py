@@ -69,7 +69,7 @@ for r in rows:
         vs = round(100 * r['start_eur'] / mv)
         mv = round(mv)
     o = {k: r.get(k) for k in ('date', 'county', 'city', 'addr', 'name', 'desc', 'rooms', 'sqm', 'cur', 'start', 'start_eur',
-                               'eval_eur', 'term', 'discount', 'eur_m2', 'flags', 'kind', 'note', 'link', 'pdf', 'lat', 'lng', 'gps_q', 'metro', 'comps', 'zone')}
+                               'eval_eur', 'term', 'discount', 'eur_m2', 'flags', 'kind', 'note', 'link', 'pdf', 'lat', 'lng', 'gps_q', 'metro', 'comps', 'zone', 'term_src')}
     e = api.get(r['id'])
     pics = (e or {}).get('asset', {}).get('pictures') or []
     g = ((e or {}).get('asset', {}).get('guarantee') or {})
@@ -90,6 +90,7 @@ for r in rows:
     o['pic'] = f"https://prod.executori.ro/repes/api/auctions/{e['caseId']}/{e['id']}/pictures/{pics[0]}/thumbnail" if pics else None
     o.update(id=r['id'][:8],mkt_ppm=ppm, mkt_src=src, mkt_value=mv, profit=profit, vs_mkt=vs,
              metro_m=(r['metro'] or {}).get('m') if r.get('metro') else None)
+    if o.get('term_src'): o['term_src'] = o['term_src'][:260]
     for k in ('name', 'desc', 'addr'): o[k] = (o[k] or '').replace('⍽', ' ').strip()[:220]
     out.append(o)
 y, m, d = RATE_DATE.split('-')
