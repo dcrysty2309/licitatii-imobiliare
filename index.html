@@ -143,56 +143,72 @@ section[id] { scroll-margin-top: 16px; }
 .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 10px 16px; color: var(--muted); font-size: 12.5px; border-top: 1px solid var(--line); }
 .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
 
-/* filtre */
-.toolbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(8px); padding-block: 10px; margin-block: -10px 4px; }
-.filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; box-shadow: var(--shadow); }
-.field { display: flex; align-items: center; gap: 6px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 9px; padding: 0 4px 0 10px; min-width: 0; }
-.field span { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
-.field select, .field input { border: 0; background: transparent; color: var(--fg); font: 500 14px var(--f-body); padding: 8px 6px; min-width: 0; outline: none; }
-.field input[type=number] { width: 92px; }
-.field.search { flex: 1 1 200px; }
-.field.search input { width: 100%; }
-.toggle { display: inline-flex; align-items: center; gap: 7px; font-weight: 500; font-size: 13.5px; padding: 6px 10px; border-radius: 9px; border: 1px solid var(--line); background: var(--surface-2); cursor: pointer; user-select: none; }
-.toggle input { accent-color: var(--accent); margin: 0; }
-.count { margin-left: auto; color: var(--muted); font-size: 13px; white-space: nowrap; }
+/* filtre: cautare + doua grupuri de butoane rapide + meniu "mai multe" */
+.toolbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; padding-block: 10px; margin-block: -10px 6px; background: linear-gradient(var(--bg) 70%, transparent); }
+.filters { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 10px; box-shadow: var(--shadow); }
+.search { flex: 1 1 260px; display: flex; align-items: center; gap: 8px; background: var(--surface-2); border: 1px solid transparent; border-radius: 11px; padding: 0 12px; min-width: 0; transition: border-color .15s, background .15s; }
+.search:focus-within { border-color: var(--accent); background: var(--surface); }
+.search svg { width: 17px; height: 17px; color: var(--muted); flex: none; }
+.search input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--fg); font: 500 14.5px var(--f-body); padding: 11px 0; outline: none; }
+.seg { display: inline-flex; align-items: center; gap: 2px; background: var(--surface-2); border-radius: 11px; padding: 3px; }
+.seg .lbl { font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); padding: 0 8px 0 9px; }
+.seg label { position: relative; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg span { display: block; font-size: 13.5px; font-weight: 600; color: var(--muted); padding: 7px 11px; border-radius: 8px; cursor: pointer; white-space: nowrap; transition: background .12s, color .12s; }
+.seg span:hover { color: var(--fg); }
+.seg input:checked + span { background: var(--surface); color: var(--fg); box-shadow: 0 1px 3px rgb(16 40 60 / .12); }
+.seg input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 1px; }
+.more { position: relative; }
+.more summary { list-style: none; display: inline-flex; align-items: center; gap: 7px; font-size: 13.5px; font-weight: 600; color: var(--fg); padding: 9px 13px; border-radius: 11px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; user-select: none; }
+.more summary::-webkit-details-marker { display: none; }
+.more summary svg { width: 16px; height: 16px; color: var(--muted); }
+.more summary .n { background: var(--accent); color: #fff; font-size: 11px; border-radius: 999px; padding: 0 6px; line-height: 18px; }
+.more[open] summary { border-color: var(--accent); }
+.more .pop { position: absolute; right: 0; top: calc(100% + 8px); z-index: 20; width: min(320px, 86vw); background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 16px 40px rgb(16 40 60 / .18); padding: 14px; display: grid; gap: 12px; }
+.pop label.f { display: grid; gap: 5px; font-size: 12px; font-weight: 600; color: var(--muted); }
+.pop select { font: 500 14px var(--f-body); color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 9px; padding: 9px 10px; }
+.pop .chk { display: flex; align-items: center; gap: 9px; font-size: 14px; color: var(--fg); cursor: pointer; }
+.pop .chk input { accent-color: var(--accent); width: 16px; height: 16px; margin: 0; }
+.pop .reset { justify-self: start; font: 600 13px var(--f-body); color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; }
+.count { margin-left: auto; color: var(--muted); font-size: 13px; white-space: nowrap; padding-right: 6px; }
+.count b { color: var(--fg); }
 
-/* tabel */
-.tablebox { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow-x: auto; box-shadow: var(--shadow); }
-table { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 980px; }
-th, td { padding: 12px 14px; text-align: left; vertical-align: middle; border-bottom: 1px solid var(--line); }
-tbody tr:last-child td { border-bottom: 0; }
-th { background: var(--surface-2); font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); cursor: pointer; user-select: none; white-space: nowrap; }
-th:first-child { border-top-left-radius: 14px; } th:last-child { border-top-right-radius: 14px; }
-th[aria-sort="ascending"]::after { content: "  ↑"; color: var(--accent); }
-th[aria-sort="descending"]::after { content: "  ↓"; color: var(--accent); }
+/* tabel: un rand = doua linii de text, aliniate pe mijloc */
+.tablebox { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow-x: auto; box-shadow: var(--shadow); }
+table { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 960px; }
+th, td { padding: 14px 18px; text-align: left; vertical-align: middle; }
+td { border-top: 1px solid var(--line); }
+th { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); cursor: pointer; user-select: none; white-space: nowrap; padding-block: 13px; background: var(--surface); }
+th:hover { color: var(--fg); }
+th[aria-sort="ascending"], th[aria-sort="descending"] { color: var(--accent); }
+th[aria-sort="ascending"]::after { content: " ↑"; }
+th[aria-sort="descending"]::after { content: " ↓"; }
 tbody tr { cursor: pointer; transition: background .12s; }
-tbody tr:hover { background: var(--surface-2); }
+tbody tr:hover { background: color-mix(in srgb, var(--accent-soft) 55%, var(--surface)); }
 td.r, th.r { text-align: right; }
-.date b { display: block; font-weight: 600; white-space: nowrap; }
-.date span { color: var(--muted); font-size: 12.5px; }
-.prop b { display: block; font-weight: 600; }
-.prop .t { color: var(--fg); font-weight: 500; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; max-width: 360px; }
-.prop .s { color: var(--muted); font-size: 12.5px; }
-.pr b { display: block; font-size: 15.5px; font-weight: 700; white-space: nowrap; }
-.pr span { color: var(--muted); font-size: 12.5px; white-space: nowrap; }
-.vs { min-width: 150px; display: grid; gap: 4px; }
-.vs .top { display: flex; justify-content: space-between; gap: 8px; font-size: 12.5px; color: var(--muted); }
-.vs .top b { font-size: 14px; }
-.profit { font-weight: 700; white-space: nowrap; }
-.metro b { display: block; font-weight: 600; white-space: nowrap; }
-.metro span { color: var(--muted); font-size: 12.5px; white-space: nowrap; }
-.risks { display: flex; flex-wrap: wrap; gap: 4px; max-width: 220px; }
-.dash { color: var(--line); }
-.empty { padding: 28px; text-align: center; color: var(--muted); }
+.l1 { display: block; font-weight: 600; white-space: nowrap; }
+.l2 { display: block; color: var(--muted); font-size: 12.5px; margin-top: 2px; white-space: nowrap; }
+.prop .l1 { white-space: normal; }
+.prop .l1 small { color: var(--muted); font-weight: 500; font-size: 12.5px; margin-left: 4px; }
+.prop .l2 { max-width: 320px; overflow: hidden; text-overflow: ellipsis; }
+.price1 { font-size: 15.5px; font-weight: 700; }
+.vs { width: 170px; display: grid; gap: 6px; }
+.vs .top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.vs .top b { font-size: 14.5px; }
+.vs .top span { color: var(--muted); font-size: 12px; }
+.profit { font-weight: 700; white-space: nowrap; font-size: 14.5px; }
+.risks { display: flex; flex-wrap: wrap; gap: 4px; max-width: 210px; }
+.dash { color: var(--muted); opacity: .45; }
+.empty { padding: 32px; text-align: center; color: var(--muted); }
 
 /* telefon: carduri in loc de tabel */
 .list { display: none; gap: 12px; }
 @media (max-width: 760px) {
-  .toolbar { position: static; backdrop-filter: none; background: none; margin: 0 0 4px; padding: 0; }
+  .toolbar { position: static; background: none; margin: 0 0 6px; padding: 0; }
   .filters { gap: 8px; }
-  .field { flex: 1 1 calc(50% - 4px); }
-  .field select, .field input, .field input[type=number] { width: 100%; }
-  .field.search { flex-basis: 100%; }
+  .search { flex-basis: 100%; }
+  .seg { flex: 1 1 100%; overflow-x: auto; }
+  .seg span { padding: 7px 9px; }
   .tablebox { display: none; }
   .list { display: grid; }
   .count { width: 100%; margin-left: 0; }
@@ -300,16 +316,33 @@ footer p { max-width: 110ch; }
   </section>
 
   <section id="toate">
-    <div class="section-head"><h2>Toate licitațiile</h2><p>Sortează după orice coloană. Valorile de piață vin din storia.ro (prețuri cerute, −7% pentru negociere).</p></div>
+    <div class="section-head"><h2>Toate licitațiile</h2><p>Click pe un rând pentru fișa completă. Sortează din capul coloanelor.</p></div>
     <div class="toolbar">
       <div class="filters">
-        <label class="field"><span>Tip</span><select id="f-kind"><option value="">Toate</option><option value="apartament" selected>Apartamente</option><option value="casa">Case</option><option value="teren">Terenuri</option></select></label>
-        <label class="field"><span>Max €</span><input type="number" id="f-max" placeholder="oricât" step="5000" min="0"></label>
-        <label class="field"><span>Termen</span><select id="f-disc"><option value="0">Oricare</option><option value="25">II sau III</option><option value="50">Doar III</option></select></label>
-        <label class="field"><span>Județ</span><select id="f-county"><option value="">Toate</option></select></label>
-        <label class="field search"><span>Caută</span><input type="search" id="f-q" placeholder="oraș, stradă, metrou…"></label>
-        <label class="toggle"><input type="checkbox" id="f-cota" checked> Fără cote-părți</label>
-        <label class="toggle"><input type="checkbox" id="f-past" checked> Doar viitoare</label>
+        <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" id="f-q" placeholder="Caută oraș, stradă sau stație de metrou" aria-label="Caută"></label>
+        <div class="seg" role="radiogroup" aria-label="Buget">
+          <span class="lbl">Buget</span>
+          <label><input type="radio" name="budget" value="" checked><span>Orice</span></label>
+          <label><input type="radio" name="budget" value="25000"><span>&lt; 25k €</span></label>
+          <label><input type="radio" name="budget" value="50000"><span>&lt; 50k €</span></label>
+          <label><input type="radio" name="budget" value="80000"><span>&lt; 80k €</span></label>
+        </div>
+        <div class="seg" role="radiogroup" aria-label="Reducere">
+          <span class="lbl">Reducere</span>
+          <label><input type="radio" name="disc" value="0" checked><span>Toate</span></label>
+          <label><input type="radio" name="disc" value="25"><span>−25%+</span></label>
+          <label><input type="radio" name="disc" value="50"><span>−50%</span></label>
+        </div>
+        <details class="more" id="more">
+          <summary><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>Mai multe filtre <span class="n" id="more-n" hidden></span></summary>
+          <div class="pop">
+            <label class="f">Tip proprietate<select id="f-kind"><option value="apartament" selected>Apartamente</option><option value="">Toate tipurile</option><option value="casa">Case</option><option value="teren">Terenuri</option></select></label>
+            <label class="f">Județ<select id="f-county"><option value="">Toate județele</option></select></label>
+            <label class="chk"><input type="checkbox" id="f-cota" checked> Ascunde cotele-părți</label>
+            <label class="chk"><input type="checkbox" id="f-past" checked> Doar licitații viitoare</label>
+            <button class="reset" type="button" id="f-reset">Resetează filtrele</button>
+          </div>
+        </details>
         <span class="count" id="count"></span>
       </div>
     </div>
@@ -408,7 +441,7 @@ function init() {
         <div class="spec">${esc(roomsTxt(r) || r.name)}</div>
         <div class="price num">${eur(r.start_eur)}<small>pornire</small></div>
         <div class="meter"><div class="row"><span>față de piață</span><b class="num" style="color:${vsColor(r.vs_mkt)}">${r.vs_mkt}%</b></div>${vsBar(r.vs_mkt)}</div>
-        <div class="facts"><span>Profit est. <b class="num">${eur(r.profit)}</b></span><span>${fmtDate(r.date)}</span>${r.metro ? `<span>Metrou ${esc(r.metro.name)} · <b>${r.metro.walk_min} min</b></span>` : ''}</div>
+        <div class="facts"><span>Garanție <b class="num">${eur(r.guar_eur)}</b></span><span>Profit est. <b class="num">${eur(r.profit)}</b></span><span>${fmtDate(r.date)}</span>${r.metro ? `<span>Metrou ${esc(r.metro.name)} · <b>${r.metro.walk_min} min</b></span>` : ''}</div>
       </div>
     </button>`).join('');
   document.querySelectorAll('#picks .card').forEach(c => c.addEventListener('click', () => openPanel(byId(c.dataset.id))));
@@ -423,7 +456,13 @@ function init() {
   map.on('click', () => map.scrollWheelZoom.enable());
 
   buildHead();
-  ['f-kind', 'f-max', 'f-disc', 'f-county', 'f-q', 'f-cota', 'f-past'].forEach(id => document.getElementById(id).addEventListener('input', render));
+  ['f-kind', 'f-county', 'f-q', 'f-cota', 'f-past'].forEach(id => document.getElementById(id).addEventListener('input', render));
+  document.querySelectorAll('input[name=budget], input[name=disc]').forEach(el => el.addEventListener('change', render));
+  document.getElementById('f-reset').addEventListener('click', () => {
+    document.getElementById('f-kind').value = 'apartament'; document.getElementById('f-county').value = '';
+    document.getElementById('f-cota').checked = true; document.getElementById('f-past').checked = true; render();
+  });
+  document.addEventListener('click', e => { const m = document.getElementById('more'); if (m.open && !m.contains(e.target)) m.open = false; });
   render();
   const h = location.hash.slice(1);
   if (h && byId(h)) openPanel(byId(h));
@@ -431,8 +470,8 @@ function init() {
 const byId = id => ROWS.find(x => x.id === id);
 
 const COLS = [
-  ['date', 'Licitația'], ['city', 'Proprietate'], ['start_eur', 'Preț de pornire', 'r'], ['vs_mkt', 'Față de piață'],
-  ['profit', 'Profit est.', 'r'], ['metro_m', 'Metrou'], ['flags', 'Riscuri']
+  ['date', 'Licitația'], ['city', 'Proprietate'], ['start_eur', 'Preț · garanție', 'r'], ['vs_mkt', 'Față de piață'],
+  ['profit', 'Profit est.', 'r'], ['metro_m', 'Metrou'], ['flags', 'Atenție']
 ];
 let sortKey = 'vs_mkt', sortDir = 1;
 function buildHead() {
@@ -446,10 +485,13 @@ function buildHead() {
 }
 
 function filtered() {
-  const kind = document.getElementById('f-kind').value, max = parseFloat(document.getElementById('f-max').value) || Infinity;
-  const disc = parseInt(document.getElementById('f-disc').value, 10), county = document.getElementById('f-county').value;
+  const kind = document.getElementById('f-kind').value, county = document.getElementById('f-county').value;
+  const max = parseFloat(document.querySelector('input[name=budget]:checked').value) || Infinity;
+  const disc = parseInt(document.querySelector('input[name=disc]:checked').value, 10);
   const q = document.getElementById('f-q').value.trim().toLowerCase();
   const hideC = document.getElementById('f-cota').checked, fut = document.getElementById('f-past').checked;
+  const extra = (kind !== 'apartament') + !!county + !hideC + !fut;
+  const n = document.getElementById('more-n'); n.hidden = !extra; n.textContent = extra;
   return ROWS.filter(r => (!kind || r.kind === kind) && r.start_eur <= max && (!county || r.county === county)
     && (!disc || (r.discount != null && r.discount >= disc - 1)) && (!hideC || !isCota(r)) && (!fut || r.date.slice(0, 10) >= TODAY)
     && (!q || [r.city, r.addr, r.name, r.desc, r.county, r.metro && r.metro.name].join(' ').toLowerCase().includes(q)));
@@ -457,7 +499,7 @@ function filtered() {
 
 function vsCell(r) {
   if (r.vs_mkt == null) return `<span class="dash">—</span>`;
-  return `<div class="vs"><div class="top"><b class="num" style="color:${vsColor(r.vs_mkt)}">${r.vs_mkt}%</b><span class="num">${r.eur_m2} vs ${r.mkt_ppm} €/mp${r.mkt_src === 'storia' ? '' : '*'}</span></div>${vsBar(r.vs_mkt)}</div>`;
+  return `<div class="vs" title="${r.eur_m2} €/mp aici, ${r.mkt_ppm} €/mp în piață${r.mkt_src === 'storia' ? ' (storia.ro)' : ' (estimare)'}"><div class="top"><b class="num" style="color:${vsColor(r.vs_mkt)}">${r.vs_mkt}%</b><span class="num">piață ${nf.format(r.mkt_ppm)} €/mp${r.mkt_src === 'storia' ? '' : '*'}</span></div>${vsBar(r.vs_mkt)}</div>`;
 }
 
 function render() {
@@ -468,21 +510,21 @@ function render() {
     return (typeof x === 'number' ? x - y : String(x).localeCompare(String(y), 'ro')) * sortDir;
   });
   document.querySelectorAll('#thead th').forEach(th => th.setAttribute('aria-sort', th.dataset.k === sortKey ? (sortDir > 0 ? 'ascending' : 'descending') : 'none'));
-  document.getElementById('count').textContent = `${rows.length} rezultate`;
+  document.getElementById('count').innerHTML = `<b>${rows.length}</b> rezultate`;
   const profitHtml = r => r.profit == null ? '<span class="dash">—</span>' : `<span class="profit num" style="color:${r.profit > 10000 ? 'var(--good)' : r.profit < 0 ? 'var(--bad)' : 'var(--fg)'}">${eur(r.profit)}</span>`;
   document.getElementById('tbody').innerHTML = rows.map(r => `<tr data-id="${r.id}" tabindex="0">
-    <td class="date"><b>${fmtDate(r.date)}</b><span class="num">ora ${esc(r.date.slice(11))}</span></td>
-    <td class="prop"><b>${esc(r.city)} <span class="s">· ${esc(r.county)}</span></b><span class="t">${esc(r.name)}</span><span class="s">${esc(roomsTxt(r))}</span></td>
-    <td class="r pr"><b class="num">${eur(r.start_eur)}</b><span class="num">evaluare ${eur(r.eval_eur)}</span><div style="margin-top:4px">${termChip(r.term)}</div></td>
+    <td><span class="l1">${fmtDate(r.date)}</span><span class="l2">${termChip(r.term)}</span></td>
+    <td class="prop"><span class="l1">${esc(r.city)}<small>${esc(r.county)}</small></span><span class="l2">${esc(roomsTxt(r) || r.name)}</span></td>
+    <td class="r"><span class="l1 price1 num">${eur(r.start_eur)}</span><span class="l2 num">garanție ${eur(r.guar_eur)}</span></td>
     <td>${vsCell(r)}</td>
     <td class="r">${profitHtml(r)}</td>
-    <td class="metro">${r.metro ? `<b class="num">${r.metro.walk_min} min</b><span>${esc(r.metro.name)}</span>` : '<span class="dash">—</span>'}</td>
-    <td><div class="risks">${riskChips(r.flags) || '<span class="dash">—</span>'}</div></td>
-  </tr>`).join('') || `<tr><td colspan="${COLS.length}" class="empty">Niciun rezultat pentru filtrele alese.</td></tr>`;
+    <td>${r.metro ? `<span class="l1 num">${r.metro.walk_min} min</span><span class="l2">${esc(r.metro.name)}</span>` : ''}</td>
+    <td><div class="risks">${riskChips(r.flags)}</div></td>
+  </tr>`).join('') || `<tr><td colspan="${COLS.length}" class="empty">Niciun rezultat. Încearcă alt buget sau resetează filtrele din „Mai multe filtre”.</td></tr>`;
   document.getElementById('list').innerHTML = rows.map(r => `<button class="lcard" type="button" data-id="${r.id}">
     <div class="head"><div><h3>${esc(r.city)}</h3><span class="muted" style="font-size:12.5px">${esc(r.county)} · ${fmtDate(r.date)}</span></div>${termChip(r.term)}</div>
     <div class="muted" style="font-size:13px">${esc(roomsTxt(r) || r.name)}</div>
-    <div class="price num" style="font-size:22px">${eur(r.start_eur)}<small>pornire</small></div>
+    <div class="price num" style="font-size:22px">${eur(r.start_eur)}<small>garanție ${eur(r.guar_eur)}</small></div>
     ${r.vs_mkt != null ? `<div class="meter"><div class="row"><span>față de piață</span><b class="num" style="color:${vsColor(r.vs_mkt)}">${r.vs_mkt}%</b></div>${vsBar(r.vs_mkt)}</div>` : ''}
     <div class="facts">${r.profit != null ? `<span>Profit est. <b class="num">${eur(r.profit)}</b></span>` : ''}${r.metro ? `<span>Metrou ${esc(r.metro.name)} · <b>${r.metro.walk_min} min</b></span>` : ''}</div>
     ${r.flags ? `<div class="risks">${riskChips(r.flags)}</div>` : ''}
@@ -533,9 +575,9 @@ function openPanel(r) {
       ${verdict}
       <div class="figs">
         <div class="fig"><span>Preț de pornire</span><b>${eur(r.start_eur)}</b></div>
+        <div class="fig"><span>Garanție de participare</span><b>${eur(r.guar_eur)}</b></div>
         <div class="fig"><span>Evaluare</span><b>${eur(r.eval_eur)}</b></div>
         <div class="fig"><span>Valoare de piață</span><b>${eur(r.mkt_value)}</b></div>
-        <div class="fig"><span>€/mp aici</span><b>${r.eur_m2 ? nf.format(r.eur_m2) : '—'}</b></div>
         <div class="fig"><span>€/mp piață${r.mkt_src === 'storia' ? '' : ' (estimare)'}</span><b>${r.mkt_ppm ? nf.format(r.mkt_ppm) : '—'}</b></div>
         <div class="fig"><span>Profit estimat</span><b style="color:${r.profit > 10000 ? 'var(--good)' : r.profit < 0 ? 'var(--bad)' : 'inherit'}">${eur(r.profit)}</b></div>
       </div>
@@ -544,6 +586,8 @@ function openPanel(r) {
         <dt>Licitația</dt><dd>${fmtDate(r.date)}, ora ${esc(r.date.slice(11))}</dd>
         <dt>Termen</dt><dd>${termChip(r.term)}</dd>
         ${r.cur === 'RON' ? `<dt>Preț în lei</dt><dd class="num">${lei(r.start)}</dd>` : ''}
+        <dt>Garanție</dt><dd><span class="num">${eur(r.guar_eur)}${r.cur === 'RON' && r.guar ? ` (${lei(r.guar)})` : ''}</span><br><span class="muted" style="font-size:12.5px">De regulă 10% din prețul de pornire. Se plătește în contul executorului, iar dovada se atașează ofertei de cumpărare, de obicei până în ziua dinaintea licitației (ofertele la prețul de pornire pot fi depuse și în ziua licitației). Se restituie dacă nu câștigi. Contul și termenul exact sunt în publicația PDF.</span></dd>
+        ${r.eur_m2 ? `<dt>Preț / mp</dt><dd class="num">${nf.format(r.eur_m2)} €/mp aici · ${r.mkt_ppm ? nf.format(r.mkt_ppm) + ' €/mp în piață' : '—'}</dd>` : ''}
         <dt>Metrou</dt><dd>${r.metro ? `${esc(r.metro.name)} · ${nf.format(r.metro.m)} m (circa ${r.metro.walk_min} min pe jos)` : '—'}</dd>
         <dt>Adresă</dt><dd>${esc(r.addr || '—')}<br><span class="muted" style="font-size:12.5px">Precizie pe hartă: ${esc(r.gps_q)}</span></dd>
         <dt>Riscuri</dt><dd><div class="risks" style="max-width:none">${riskChips(r.flags) || '<span class="muted">niciunul detectat automat</span>'}</div></dd>
