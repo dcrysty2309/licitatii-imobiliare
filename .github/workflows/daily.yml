@@ -41,6 +41,7 @@ jobs:
       - name: Rulez actualizarea
         env:
           TZ: Europe/Bucharest
+          OMP_THREAD_LIMIT: '1'
         run: ./pipeline/run_daily.sh
 
       - name: Salvez directorul de lucru

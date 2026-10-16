@@ -21,7 +21,11 @@ def work(path):
             for i, p in enumerate(pages):
                 img = os.path.join(td, f'{i}.png')
                 p.get_pixmap(dpi=250).save(img)
-                r = subprocess.run(['tesseract', img, '-', '-l', 'eng', '--psm', '6'], capture_output=True, text=True)
+                try:
+                    r = subprocess.run(['tesseract', img, '-', '-l', 'eng', '--psm', '6'], capture_output=True, text=True,
+                                       timeout=180, env=dict(os.environ, OMP_THREAD_LIMIT='1'))
+                except subprocess.TimeoutExpired:
+                    continue
                 parts.append(r.stdout)
         text = '\n'.join(parts)
     open(out, 'w').write(text)
@@ -33,5 +37,5 @@ if __name__ == '__main__':
     with ProcessPoolExecutor(max_workers=max(2, os.cpu_count() or 2)) as ex:
         for i, (n, m) in enumerate(ex.map(work, files)):
             c[m] += 1
-            if i % 25 == 0: print(i, dict(c), flush=True)
+            if i % 10 == 0: print(i, '/', len(files), dict(c), flush=True)
     print('OCR gata', dict(c), flush=True)
