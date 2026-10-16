@@ -30,8 +30,8 @@ if __name__ == '__main__':
     files = sorted(glob.glob(os.path.join(PUBS, '*.pdf')))
     from collections import Counter
     c = Counter()
-    with ProcessPoolExecutor(max_workers=8) as ex:
+    with ProcessPoolExecutor(max_workers=max(2, os.cpu_count() or 2)) as ex:
         for i, (n, m) in enumerate(ex.map(work, files)):
             c[m] += 1
             if i % 25 == 0: print(i, dict(c), flush=True)
-    print('DONE', dict(c), flush=True)
+    print('OCR gata', dict(c), flush=True)

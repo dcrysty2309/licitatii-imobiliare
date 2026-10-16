@@ -168,7 +168,25 @@ print('targets', len(targets), flush=True)
 done = 0
 for r in rows:
     r['zone'] = None
+PREV_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data.json')
+PREV = {}
+if os.path.exists(PREV_PATH):
+    try:
+        _d = json.load(open(PREV_PATH))
+        _upd = _d.get('updated', '')
+        for o in _d['rows']:
+            z = o.get('zone')
+            if z and z.get('status') == 'ok':
+                if not z.get('computed') and _upd:
+                    dd, mm, yy = _upd.split('.'); z['computed'] = f'{yy}-{mm}-{dd}'
+                PREV[o['id']] = z
+    except Exception as ex:
+        print('nu pot citi data.json anterior:', ex)
+reused = 0
 for r in targets:
+    pz = PREV.get(r['id'][:8])
+    if pz and pz.get('computed') and (NOW - datetime.fromisoformat(pz['computed']).replace(tzinfo=timezone.utc)).days < TTL_DAYS:
+        r['zone'] = pz; reused += 1; continue
     county, city = slug(r['county']), slug(r['city'])
     if county == 'bucuresti':
         city_loc = f'bucuresti/{city}' if city.startswith('sectorul') else 'bucuresti'
@@ -238,7 +256,7 @@ for r in targets:
         'status': 'ok', 'level': level, 'district': district[0] if district else None, 'match': district[2] if district else None,
         'n': len(clean), 'median_ppm': round(statistics.median(clean)), 'p25': round(q[0]), 'p75': round(q[-1]),
         'search_url': pool_url, 'olx_url': olx, 'checked': len(cand), 'active_ok': len(checked),
-        'scope': scope, 'radius_m': RADIUS_M, 'n_near': len(near), 'precise': precise,
+        'computed': TODAY, 'scope': scope, 'radius_m': RADIUS_M, 'n_near': len(near), 'precise': precise,
         'items': [{k: i[k] for k in ('url', 'title', 'area', 'rooms', 'floor', 'price', 'dist', 'age', 'modified')} for i in picks],
     }
     done += 1
@@ -246,5 +264,5 @@ for r in targets:
 
 json.dump(rows, open(os.path.join(BASE, 'rows4_test.json' if ONLY else 'rows4.json'), 'w'), ensure_ascii=False)
 from collections import Counter
-print('blocked responses:', BLOCKED['n'])
+print('zone refolosite:', reused, '| raspunsuri blocate:', BLOCKED['n'], flush=True)
 print('DONE', Counter((r['zone'] or {}).get('status') for r in targets), Counter((r['zone'] or {}).get('level') for r in targets), flush=True)

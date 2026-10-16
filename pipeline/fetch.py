@@ -38,23 +38,34 @@ while (page - 1) * 16 < total + 16 and page < 200:
 if len(entries) < 0.5 * total:
     raise SystemExit(f'Lista REPES incompleta: {len(entries)} din {total}')
 json.dump(list(entries.values()), open(os.path.join(WORK, 'apts_all.json'), 'w'), ensure_ascii=False)
-print(f'REPES: {len(entries)} anunturi (totalCount {total})')
+print(f'REPES: {len(entries)} anunturi (totalCount {total})', flush=True)
 
 meta_path = os.path.join(WORK, 'pubmeta.json')
 meta = json.load(open(meta_path)) if os.path.exists(meta_path) else {}
-new = 0
+from concurrent.futures import ThreadPoolExecutor
+todo = []
 for e in entries.values():
     if e['date'][:10] < TODAY: continue
     pid = e.get('publicationFile')
     txt = os.path.join(WORK, 'txt', e['id'] + '.txt')
+    pdf = os.path.join(WORK, 'pubs', e['id'] + '.pdf')
     if meta.get(e['id']) == pid and os.path.exists(txt) and os.path.getsize(txt) > 0:
         continue
+    if meta.get(e['id']) == pid and os.path.exists(pdf) and os.path.getsize(pdf) > 1000:
+        continue  # descarcata deja (ex. rulare anterioara intrerupta), urmeaza OCR
     if os.path.exists(txt): os.remove(txt)  # publicatie schimbata: o citim din nou
-    pdf = os.path.join(WORK, 'pubs', e['id'] + '.pdf')
-    subprocess.run(['curl', '-s', '-m', '90', '-A', UA, '-o', pdf, f"{API}/{e['caseId']}/{e['id']}/publication/"])
-    if os.path.exists(pdf) and os.path.getsize(pdf) > 1000:
-        meta[e['id']] = pid
-        new += 1
-    time.sleep(0.3)
+    todo.append((e, pid, pdf))
+def dl(item):
+    e, pid, pdf = item
+    for attempt in range(3):
+        subprocess.run(['curl', '-s', '-m', '120', '-A', UA, '-o', pdf, f"{API}/{e['caseId']}/{e['id']}/publication/"])
+        if os.path.exists(pdf) and os.path.getsize(pdf) > 1000: return e['id'], pid
+        time.sleep(3)
+    return e['id'], None
+new = 0
+with ThreadPoolExecutor(max_workers=6) as ex:
+    for i, (eid, pid) in enumerate(ex.map(dl, todo)):
+        if pid: meta[eid] = pid; new += 1
+        if i % 50 == 0: print(f'  descarcate {i}/{len(todo)}', flush=True)
 json.dump(meta, open(meta_path, 'w'))
-print(f'publicatii noi sau schimbate descarcate: {new}')
+print(f'publicatii noi sau schimbate descarcate: {new} (din {len(todo)})', flush=True)
